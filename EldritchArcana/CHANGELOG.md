@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -Crossblooded sorcerer can choose a bloodline mutation.
 
 ### Fixed
--Prestigious spellcaster is now being added correctly again.
+-Prestigious spellcaster is now being added correctly again.e
 
 ## [1.1.4]
 
