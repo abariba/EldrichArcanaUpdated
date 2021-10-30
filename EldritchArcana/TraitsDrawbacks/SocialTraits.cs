@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Kingmaker;
@@ -69,21 +68,8 @@ namespace EldritchArcana
                 "You had a knack for getting yourself into trouble as a child, and as a result developed a silver tongue at an early age.",
                 "509458a5ded54ecd9a2a4ef5388de2b7",
                 StatType.SkillPersuasion));
-            /*
-            var summonedBow = library.Get<BlueprintWeaponType>("2fe00e2c0591ecd4b9abee963373c9a7");
-            choices.Add(Helpers.CreateFeature("HairloomTrait", "Family Hairloom",
-                "you inheritid this bow \nBenefit:you can shoot better with longbows",
-                "e16eb56b2f964321a30086226dccb29e",
-                Helpers.GetIcon("c3a66c1bbd2fb65498b130802d5f183a"), // DuelingMastery
-                FeatureGroup.None,
-                Helpers.Create<AddStartingEquipment>(a =>
-                {
-                    a.CategoryItems = new WeaponCategory[] {WeaponCategory.Longbow};
-                    a.RestrictedByClass = Array.Empty<BlueprintCharacterClass>();
-                    a.BasicItems = Array.Empty<BlueprintItem>();
-                }),
-                //Helpers.Create<WeaponAttackAndCombatManeuverBonus>(a => { a.WeaponType = duelingSword; a.AttackBonus = 1; a.Descriptor = ModifierDescriptor.Trait; }),
-                Helpers.Create<WeaponAttackAndCombatManeuverBonus>(a => { a.WeaponType = summonedBow; a.AttackBonus = 1; a.Descriptor = ModifierDescriptor.Trait; })));*/
+
+            //var ArchaeologistCleverExplorer = Traits.library.Get<BlueprintFeature>("1322e50d2b36aba45ab5405db43c53a3");
             
             var performanceResource = Traits.library.Get<BlueprintAbilityResource>("e190ba276831b5c4fa28737e5e49e6a6");
             choices.Add(Helpers.CreateFeature("MaestroOfTheSocietyTrait", "Maestro of the Society",
@@ -93,10 +79,127 @@ namespace EldritchArcana
                 FeatureGroup.None,
                 Helpers.Create<IncreaseResourceAmount>(i => { i.Resource = performanceResource; i.Value = 3; })));
 
+            var gnomeReq = Helpers.PrerequisiteFeature(Helpers.gnome);
+            //var performanceResource = Traits.library.Get<BlueprintAbilityResource>("e190ba276831b5c4fa28737e5e49e6a6");
+            var MutagenResource = Traits.library.Get<BlueprintAbilityResource>("3b163587f010382408142fc8a97852b6");
+            choices.Add(Helpers.CreateFeature("GnomishAlchemistTrait", "Gnomish Alchemist",
+                "a Gnomish alchemist discovers how to create a special elixir that he can imbibe in order to heighten his ability This is so potent it can be used an extra time. When consumed, the elixir causes the Alchemist’s skin to change color to match the background and causes his hands and feet to secrete a sticky residue.\n" +
+                "Benfefit:you can use your mutagen an additinal 2 times per day.",
+                "125cdf262e4147cda2c670db81852c69",
+                Helpers.GetIcon("0d3651b2cb0d89448b112e23214e744e"),
+                FeatureGroup.None,
+                Helpers.Create<IncreaseResourceAmount>(i => { i.Resource = MutagenResource; i.Value = 2; }),
+                gnomeReq));
+
+
+
+            var Clever = Helpers.CreateFeatureSelection("CleverWordplayTrait", "Clever Wordplay",
+             "Your cunning and logic are more than a match for another’s confidence and poise.\n" +
+             "Benefit: Choose a skill normally decided by Charisma and use Intelligence instead.",
+             "2d4dcccc21e158cdaf2cd4c643249cbf",
+             Helpers.NiceIcons(46), 
+             FeatureGroup.None);
+
+            var CleverOptions = new BlueprintFeature[2];
+            var icons = new int[] { 24, 48 };
+
+            var Stats = new StatType[] {
+                StatType.SkillUseMagicDevice,
+                StatType.SkillPersuasion,
+            };
+            for (int i = 0; i < 2; i++)
+            {
+                CleverOptions[i] = Helpers.CreateFeature($"CleverWordplayTrait{Stats[i]}", $"Use Intelligence for calculating {Stats[i]}",
+                    "Your cunning and logic are more than a match for another’s confidence and poise.\n" +
+                    $"Benefit: You modify your {Stats[i]} using your Intelligence modifier.",
+                    $"a98{i}f{i}e69db44c{i}d889{i}3885e37a6c{i}b",
+                    Helpers.NiceIcons(i),
+                    FeatureGroup.None,
+                    Helpers.Create<ReplaceBaseStatForStatTypeLogic>(x =>
+                    {
+                        x.StatTypeToReplaceBastStatFor = Stats[i];
+                        x.NewBaseStatType = StatType.Intelligence;
+                    })
+                    );
+            }
+            Clever.SetFeatures(CleverOptions);
+            choices.Add(Clever);
+
+
+
+            var AvidReader = Helpers.CreateFeatureSelection("AvidReaderTrait", "Avid Reader",
+                "As a youth, you voraciously consumed books and scrolls provided by a member of an adventurer’s guild or a learned organization like the Pathfinder Society, and you have internalized these stories of bold adventurers." +
+                "\nBenefit: Choose one Knowledge skill. You always choose to take 10 on checks with the chosen Knowledge skill, even when distracted or threatened.",
+                "2e4dcdce32e159cbaf0fb3c641249cbf",
+                Image2Sprite.Create("Mods/EldritchArcana/sprites/opposition_research.png"),FeatureGroup.None );
+
+
+
+
+            var AvidReaderOptions = new List<BlueprintFeature>(){
+
+                Helpers.CreateFeature("AvidReaderArcana", "Knowledge Arcana",
+                    "Because you are a magic bookworm\n" +
+                    "Benefit: You can always choose to take 10 on checks with knowledge arcana, even when distracted or threatened.",
+                    $"a932f3e69db44cdd33965985e37a6d2b",
+                    Image2Sprite.Create("Mods/EldritchArcana/sprites/spell_perfection.png"),
+                    FeatureGroup.None,
+                    Helpers.Create<Take10ForSuccessLogic>(t => t.Skill = StatType.SkillKnowledgeArcana)
+                  ),Helpers.CreateFeature("AvidReaderWorld", "Knowledge World",
+                    "Becouse you are a bookworm.\n" +
+                    "Benefit: You can always choose to take 10 on checks with knowledge world, even when distracted or threatened.",
+                    $"b254f3e69db44cdd33964985e37a6d1b",
+                    Image2Sprite.Create("Mods/EldritchArcana/sprites/opposition_research.png"),
+                    FeatureGroup.None,
+                    Helpers.Create<Take10ForSuccessLogic>(t => t.Skill = StatType.SkillKnowledgeWorld)
+                  ),
+
+            };
+
+
+            AvidReader.SetFeatures(AvidReaderOptions);
+            choices.Add(AvidReader);
+
             choices.Add(Traits.CreateAddStatBonus("SuspiciousTrait", "Suspicious",
                 "You discovered at an early age that someone you trusted, perhaps an older sibling or a parent, had lied to you, and lied often, about something you had taken for granted, leaving you quick to question the claims of others.",
                 "2f4e86a9d42547bc85b4c829a47d054c",
                 StatType.SkillPerception));
+
+
+            var isUndead = Traits.library.Get<BlueprintFeature>("734a29b693e9ec346ba2951b27987e33");
+            
+
+
+
+
+            var HuntersbloodDescription = "Your family is known to hunt undead, your family's expertise in these aereas has gotten you quite a reputation. a reputation among undead as well. \nThrough your family's lessons you recieve a slight edge when fighting undead(+1att+1dmg+1ac)";
+            var Huntersblood = Helpers.CreateFeatureSelection("HuntersbloodTrait", "Hunter's blood",
+                HuntersbloodDescription +
+                "\nBenefits: Select one of the following skills: Persuasion, Lore Nature, or Lore Religion. You gain a +1 trait bonus on checks with that skill, and it is always a class skill for you.",
+                "2e3dcdce32e159cbaf0fb3c351249cbf",
+                Image2Sprite.Create("Mods/EldritchArcana/sprites/revelations_extra.png"), FeatureGroup.None, 
+                Helpers.Create<AttackBonusAgainstFactOwner>(w => { w.CheckedFact = isUndead; w.Descriptor = ModifierDescriptor.Trait; w.Bonus = 1; }),
+                Helpers.Create<DamageBonusAgainstFactOwner>(w => { w.CheckedFact = isUndead; w.Descriptor = ModifierDescriptor.Trait; w.Bonus = 1; }),
+                Helpers.Create<ACBonusAgainstFactOwner>(w => { w.CheckedFact = isUndead; w.Descriptor = ModifierDescriptor.Trait; w.Bonus = 1; })
+                );
+
+
+
+
+            var HuntersbloodOptions = new StatType[] {
+                StatType.SkillPersuasion,
+                StatType.SkillLoreReligion,
+                StatType.SkillLoreNature
+            }.Select(skill => Traits.CreateAddStatBonus(
+                $"Huntersblood{skill}Trait",
+                $"Hunter's blood — {UIUtility.GetStatText(skill)}",
+                HuntersbloodDescription,
+                Helpers.MergeIds(Helpers.GetSkillFocus(skill).AssetGuid, "2c02b4ff17394257a3fbec18aa42603d"),
+                skill)).ToArray();
+            
+
+            Huntersblood.SetFeatures(HuntersbloodOptions);
+            choices.Add(Huntersblood);
 
             choices.Add(UndoSelection.Feature.Value);
             socialTraits.SetFeatures(choices);

@@ -55,7 +55,7 @@ namespace EldritchArcana
             crossblooded.SetIcon(sorcererClass.Icon);
 
             crossblooded.ReplaceSpellbook = CreateReplacementSpellbook();
-
+            //gets bloodlines
             var bloodlineSelection = Helpers.bloodlineSelection;
             var bloodlines = bloodlineSelection.AllFeatures.Cast<BlueprintProgression>().ToList();
 
@@ -235,10 +235,10 @@ namespace EldritchArcana
             var NoBloodrager = bloodOfDragonsSelection.AllFeatures.ToArray();
             //Log.Write("started looping bloodofdragonselection");
             var draconicBloodlines = new BlueprintFeature[10];
-            var otherBloodlines = new BlueprintFeature[NoBloodrager.Length-10];
+            //var otherBloodlines = new BlueprintFeature[NoBloodrager.Length-10];
             string bloodragerTester;
             int x = 0;
-            int y = 0;
+            //int y = 0;
             foreach (var bloodlinethingy in NoBloodrager)
             {
                 bloodragerTester = bloodlinethingy.GetName();
@@ -252,9 +252,9 @@ namespace EldritchArcana
                 }
                 else
                 {
-                    otherBloodlines[y] = bloodlinethingy;
-                    y++;
-                    Log.Write(bloodlinethingy.GetName());
+                    //otherBloodlines[y] = bloodlinethingy;
+                    //y++;
+                    //Log.Write(bloodlinethingy.GetName());
                     //bloodlinethingy.
                 }
 

@@ -601,7 +601,7 @@ namespace EldritchArcana
 
                 if (checkMoneyChanged && money == lastMoney) return;
                 lastMoney = money;
-
+                //var x = Owner.HPLeft;
                 var requiredMoney = Owner.Progression.CharacterLevel * 200 + 100;
                 Log.Append($"Covetous curse: check {Owner.CharacterName}, money {money}, requires {requiredMoney}");
                 if (money < requiredMoney)

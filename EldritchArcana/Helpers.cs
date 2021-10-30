@@ -144,7 +144,14 @@ namespace EldritchArcana
             BlueprintScriptableObject existing;
             if (library.BlueprintsByAssetId.TryGetValue(guid, out existing))
             {
-                throw Main.Error($"Duplicate AssetId, existing entry ID: {guid}, name: {existing.name}, type: {existing.GetType().Name}");
+                Main.Error($"Duplicate AssetId, existing entry ID: {guid}, name: {existing.name}, type: {existing.GetType().Name}");
+                for (int i = 0; i < 8; i++)
+                {
+                    guid = guid.Replace($"{i}", $"{i+1}");
+                }
+                Main.Error($"Reatempting");
+                AddAsset(library, blueprint, guid);
+                return;
             }
             else if (guid == "")
             {
@@ -443,6 +450,7 @@ namespace EldritchArcana
             spells.Add(spell);
         }
 
+        
 
     // Similar to `metamagic.DefaultCost()`, but returns the result before Bag of Tricks
     // modifies it to 0.
@@ -688,6 +696,7 @@ namespace EldritchArcana
         public static List<BlueprintCharacterClass> classes;
 
         public static List<BlueprintCharacterClass> prestigeClasses;
+        public static List<BlueprintCharacterClass> prestigeClassesSkipLevels;
 
         public static BlueprintCharacterClass sorcererClass, magusClass, dragonDiscipleClass;
         public static BlueprintArchetype eldritchScionArchetype;
@@ -695,7 +704,7 @@ namespace EldritchArcana
         const String basicFeatSelection = "247a4068296e8be42890143f451b4b45";
         public const String magusFeatSelection = "66befe7b24c42dd458952e3c47c93563";
 
-        public static BlueprintRace human, halfElf, halfOrc, elf, dwarf, halfling, gnome, aasimar, tiefling;
+        public static BlueprintRace human, halfElf, halfOrc, elf, dwarf, halfling, gnome, aasimar, tiefling,goblin;
 
         public static LocalizedString tenMinPerLevelDuration, minutesPerLevelDuration, hourPerLevelDuration, roundsPerLevelDuration, oneRoundDuration;
 
@@ -727,6 +736,8 @@ namespace EldritchArcana
             const String eldritchScionClassId = "f5b8c63b141b2f44cbb8c2d7579c34f5";
             classes = library.Root.Progression.CharacterClasses.Where(c => c.AssetGuid != eldritchScionClassId).ToList();
             prestigeClasses = classes.Where(c => c.PrestigeClass).ToList();
+            prestigeClassesSkipLevels = prestigeClasses.Where(c => c.GetComponent<SkipLevelsForSpellProgression>()).ToList();
+
             sorcererClass = GetClass("b3a505fb61437dc4097f43c3f8f9a4cf");
             magusClass = GetClass("45a4607686d96a1498891b3286121780");
             dragonDiscipleClass = Helpers.GetClass("72051275b1dbb2d42ba9118237794f7c");
@@ -741,6 +752,7 @@ namespace EldritchArcana
             gnome = library.Get<BlueprintRace>("ef35a22c9a27da345a4528f0d5889157");
             aasimar = library.Get<BlueprintRace>("b7f02ba92b363064fb873963bec275ee");
             tiefling = library.Get<BlueprintRace>("5c4e42124dc2b4647af6e36cf2590500");
+            goblin = library.Get<BlueprintRace>("9d168ca7100e9314385ce66852385451");
 
             skillFocusFeat = library.Get<BlueprintFeatureSelection>("c9629ef9eebb88b479b2fbc5e836656a");
 
@@ -1235,7 +1247,7 @@ namespace EldritchArcana
         }
 
         public static AddStatBonus CreateAddStatBonusOnLevel(StatType stat, int value, ModifierDescriptor descriptor,
-            int minLevel = 1, int maxLevel = 20)
+            int minLevel = 1, int maxLevel = 65)
         {
             var addStat = Create<AddStatBonusOnLevel>();
             addStat.Stat = stat;
@@ -1288,6 +1300,8 @@ namespace EldritchArcana
             Main.library.AddAsset(resource, guid);
             return resource;
         }
+
+
 
         public static AbilityResourceLogic CreateResourceLogic(this BlueprintAbilityResource resource, bool spend = true)
         {
@@ -1539,32 +1553,26 @@ namespace EldritchArcana
             return replacement;
         }
 
-        internal static string getGuids(StatType skill)
+        internal static string getStattypeGuid(StatType skill)
         {
-            if (skill == StatType.AC) return "0b183a3acaf5464eaad54276413fec04";
-            if (skill == StatType.Reach) return "0b183a3acaf5464eaad54276413fec05";
-            if (skill == StatType.SneakAttack) return "0b183a3acaf5464eaad54276413fec06";
-            if (skill == StatType.Intelligence) return "0b183a3acaf5464eaad54276413fec07";
-            if (skill == StatType.BaseAttackBonus) return "0b183a3acaf5464eaad54276413fec08";
-            if (skill == StatType.AdditionalCMB) return "0b183a3acaf5464eaad54276413fec09";
-            /*
-            if (skill == StatType.AC) return "0b183a3acaf5464eaad54276413fec10";
-            if (skill == StatType.AC) return "0b183a3acaf5464eaad54276413fec11";
-            if (skill == StatType.AC) return "0b183a3acaf5464eaad54276413fec12";
-            if (skill == StatType.AC) return "0b183a3acaf5464eaad54276413fec13";
-            */
-            return "0b183a3acaf5464eaad54286413fec14";
-        }
 
-        public static void ReplaceContextRankConfig(this BlueprintScriptableObject obj, Action<ContextRankConfig> update)
-        {
-            foreach (var original in obj.GetComponents<ContextRankConfig>())
+            switch (skill)
             {
-                var replacement = UnityEngine.Object.Instantiate(original);
-                update(replacement);
-                obj.ReplaceComponent(original, replacement);
+                case StatType.AC:                     return "0b183a3acaf5464eaad54276413fec04";
+                case StatType.AdditionalAttackBonus:  return "0b183a3acaf5464ecad54276414fec09";//(1.2.4)
+                case StatType.AdditionalCMB:          return "0b183a3acaf5464eaad54276413fec09";
+                case StatType.AdditionalCMD:          return "1b194a3acaf5464eaad54276413fec08";//(1.2.4)
+                case StatType.Charisma:               return "2b194a3acaf5464eaad54376413fec23";//(1.2.4)
+                case StatType.BaseAttackBonus:        return "0b183a3acaf5464eaad54276413fec08";
+                case StatType.Intelligence:           return "0b183a3acaf5464eaad54276413fec07";
+                case StatType.Reach:                  return "0b183a3acaf5464eaad54276413fec05";
+                case StatType.SneakAttack:            return "0b183a3acaf5464eaad54276413fec06";
+                case StatType.Strength:               return "0b183a3acaf5464eabd44276413fec17";//(1.2.4)
+                case StatType.Wisdom:                 return "2b194a3acaf5464eaad54276413fec18";//(1.2.4)
+                default:                              return "0b183a3acaf5464eaad54286413fec14";
             }
         }
+
 
         public static void ReplaceContextRankConfig(this BlueprintScriptableObject obj, ContextRankConfig newConfig)
         {
@@ -1573,6 +1581,26 @@ namespace EldritchArcana
 
         public static void ReplaceComponent<T>(this BlueprintScriptableObject obj, BlueprintComponent replacement) where T : BlueprintComponent
         {
+            ReplaceComponent(obj, obj.GetComponent<T>(), replacement);
+        }
+
+
+        public static void ReplaceComponent<T>(this BlueprintScriptableObject obj, Action<T> action) where T : BlueprintComponent
+        {
+            var replacement = obj.GetComponent<T>().CreateCopy();
+            action(replacement);
+            ReplaceComponent(obj, obj.GetComponent<T>(), replacement);
+        }
+
+
+        public static void MaybeReplaceComponent<T>(this BlueprintScriptableObject obj, Action<T> action) where T : BlueprintComponent
+        {
+            var replacement = obj.GetComponent<T>()?.CreateCopy();
+            if (replacement == null)
+            {
+                return;
+            }
+            action(replacement);
             ReplaceComponent(obj, obj.GetComponent<T>(), replacement);
         }
 
@@ -1589,6 +1617,31 @@ namespace EldritchArcana
             }
             obj.SetComponents(newComponents); // fix up names if needed
         }
+
+
+
+
+        public static void ReplaceContextRankConfig(this BlueprintScriptableObject obj, Action<ContextRankConfig> update)
+        {
+            foreach (var original in obj.GetComponents<ContextRankConfig>())
+            {
+                var replacement = UnityEngine.Object.Instantiate(original);
+                update(replacement);
+                obj.ReplaceComponent(original, replacement);
+            }
+        }
+        /*
+        public static void ReplaceContextRankConfig(this BlueprintScriptableObject obj, ContextRankConfig newConfig)
+        {
+            obj.ReplaceComponent<ContextRankConfig>(newConfig);
+        }
+        */
+        public static void ReplaceTypedComponent<T>(this BlueprintScriptableObject obj, BlueprintComponent replacement) where T : BlueprintComponent
+        {
+            ReplaceComponent(obj, obj.GetComponent<T>(), replacement);
+        }
+
+
 
 
         public static ContextRankConfig CreateContextRankConfig(
@@ -2171,6 +2224,9 @@ namespace EldritchArcana
             });
             progressionRoot.CharacterClasses = classes.ToArray();
             Helpers.classes.Add(oracle);
+            prestigeClasses = classes.Where(c => c.PrestigeClass).ToList();
+            prestigeClassesSkipLevels = prestigeClasses.Where(c => c.GetComponent<SkipLevelsForSpellProgression>()).ToList();
+
         }
         //function barrowed from hollic69 from The Call of the wild.
         internal static BlueprintFeature createCantrips(string name, string display_name, string description, UnityEngine.Sprite icon, string guid, BlueprintCharacterClass character_class,
@@ -2199,6 +2255,8 @@ namespace EldritchArcana
         {
             switch (v)
             {
+                case 0:
+                    return Helpers.GetIcon("8d20b0a6129bd814eb0146041879f38a");//haste
                 case 1:
                     return Helpers.GetIcon("556100fd6a970bc43b49aa90261ce353");//grabbinghand
                 case 2:
@@ -2271,7 +2329,40 @@ namespace EldritchArcana
                     return Helpers.GetIcon("be50f4e97fff8a24ba92561f1694a945");//spelstrike
                 case 36:
                     return Helpers.GetIcon("0a5ddfbcfb3989543ac7c936fc256889");//sr
-                   
+                case 37:
+                    return Helpers.GetIcon("9d5d2d3ffdd73c648af3eb3e585b1113");//DivineFavor.
+                case 38:
+                    return Helpers.GetIcon("4f8181e7a7f1d904fbaea64220e83379");//retreat ExpeditiousRetreat.
+                case 39:
+                    return Helpers.GetIcon("8bc64d869456b004b9db255cdd1ea734");//Bane
+                case 40:
+                    return Helpers.GetIcon("403cf599412299a4f9d5d925c7b9fb33");//MagicFang
+                case 41:
+                    return Helpers.GetIcon("9cf9a185a90838d478a860e0e1362d13");//WarpaintedSkullSpell
+                case 42:
+                    return Helpers.GetIcon("fb343ede45ca1a84496c91c190a847ff");//Necromancy
+                case 43:
+                    return Helpers.GetIcon("f2115ac1148256b4ba20788f7e966830");//Restoration
+                case 44:
+                    return Helpers.GetIcon("48e2744846ed04b4580be1a3343a5d3d");//Contagion Contagion.
+                case 45:
+                    return Helpers.GetIcon("b24583190f36a8442b212e45226c54fc");//WailOfBanshee.
+                case 46:
+                    return Helpers.GetIcon("c927a8b0cd3f5174f8c0b67cdbfde539");//RemoveBlindness.
+                case 47:
+                    return Helpers.GetIcon("41cf93453b027b94886901dbfc680cb9");//overwhelmingpresentsOverwhelmingPresence.
+                case 48:
+                    return Helpers.GetIcon("754c478a2aa9bb54d809e648c3f7ac0e");//DominateAnimal.
+                //case 45:
+
+
+
+                
+
+
+
+
+
                 default:
                     return Helpers.GetIcon("0f5bd128c76dd374b8cb9111e3b5186b");//balans
             }
@@ -2284,6 +2375,31 @@ namespace EldritchArcana
             throw new NotImplementedException();
         }
 
+        internal static string spellSchoolGuid(SpellSchool school)
+        {
+            switch (school)
+            {
+                case SpellSchool.Abjuration:
+                    return "15c681d5a76c1a742abe2760376ddf6d";
+                case SpellSchool.Conjuration:
+                    return "1a258cd8e93461a4ab011c73a2c43dac";
+                case SpellSchool.Enchantment:
+                    return "e1ebc61a71c55054991863a5f6f6d2c2";
+                case SpellSchool.Evocation:
+                    return "5e33543285d1c3d49b55282cf466bef3";
+                case SpellSchool.Illusion:
+                    return "aa271e69902044b47a8e62c4e58a9dcb";
+                case SpellSchool.Necromancy:
+                    return "fb343ede45ca1a84496c91c190a847ff";
+                case SpellSchool.Transmutation:
+                    return "dd163630abbdace4e85284c55d269867";
+                case SpellSchool.Divination:
+                    return "d234e68b3d34d124a9a2550fdc3de9eb";
+                default:
+                    return "0933849149cfc9244ac05d6a5b57fd80";
+            }
+        }
+
         static readonly int[] fullCasterCost = new int[] { 13, 25, 150, 375, 700, 1125, 1650, 2275, 3000, 3825 };
         static readonly int[] threeQuartersCost = new int[] { 13, 25, 200, 525, 1000, 1625, 2400 };
         static readonly int[] halfCasterCost = new int[] { 13, 125, 400, 825, 1300 };
@@ -2291,6 +2407,7 @@ namespace EldritchArcana
         static readonly int[] fullCasterLevel = new int[] { 1, 1, 3, 5, 7, 9, 11, 13, 15, 17 };
         static readonly int[] threeQuartersLevel = new int[] { 1, 1, 4, 7, 10, 13, 16 };
         static readonly int[] halfCasterLevel = new int[] { 1, 4, 7, 10, 13 };
+        
 
         // TODO: game log messages need to use a localization helpers
         public static BattleLogView GameLog => Game.Instance.UI.BattleLogManager.LogView;

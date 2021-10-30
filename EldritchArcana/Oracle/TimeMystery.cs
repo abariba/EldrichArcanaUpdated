@@ -638,7 +638,7 @@ namespace EldritchArcana
             {
                 rule.SuccessBonus = Value.Calculate(Context);
                 Log.Write($"{GetType().Name} retry skill check for {rule.StatType} with bonus {rule.SuccessBonus}");
-                evt.SetReroll(1, true);
+                evt.SetReroll(1, true, RequiredResource.name);
 
                 Owner.Resources.Spend(RequiredResource, 1);
                 if (Owner.Resources.GetResourceAmount(RequiredResource) == 0) Buff.Remove();
@@ -694,7 +694,7 @@ namespace EldritchArcana
                 var statValue = (modValue as ModifiableValueAttributeStat)?.Bonus ?? modValue.ModifiedValue;
                 if (!rule.IsSuccessRoll(evt.PreRollDice(), statValue - rule.StatValue))
                 {
-                    evt.SetReroll(1, TakeBest);
+                    evt.SetReroll(1, TakeBest,null);
                 }
             }
             else if (Rule == RuleType.SpellResistance)
@@ -706,7 +706,7 @@ namespace EldritchArcana
                     (rule.SpellResistance > rule.SpellPenetration + evt.PreRollDice());
                 if (isSpellResisted)
                 {
-                    evt.SetReroll(1, TakeBest);
+                    evt.SetReroll(1, TakeBest,null);
                 }
             }
             else

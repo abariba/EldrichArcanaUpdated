@@ -546,7 +546,9 @@ namespace EldritchArcana
                     rule.AddTemporaryModifier(stats.SaveReflex.AddModifier(SavingThrowBonus, this, BonusDescriptor));
                     rule.AddTemporaryModifier(stats.SaveFortitude.AddModifier(SavingThrowBonus, this, BonusDescriptor));
                 }
-                evt.SetReroll(1, true);
+                //evt.SetReroll(1,)
+                
+                evt.SetReroll(1, true, RequiredResource.Name);
                 Owner.Resources.Spend(RequiredResource, 1);
                 if (Owner.Resources.GetResourceAmount(RequiredResource) == 0) Buff.Remove();
             }

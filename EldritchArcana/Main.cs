@@ -46,7 +46,8 @@ namespace EldritchArcana
 
                 // Note: needs to run before almost everything else, so they can find the Oracle class.
                 // However needs to run after spells are added, because it uses some of them.
-                SafeLoad(OracleClass.Load, "Oracle class");
+                if (Main.settings?.DrawbackForextraTraits == true) {SafeLoad(OracleClass.Load, "Oracle class"); }
+                
 
                 //Game.Instance.Player.Inventory.Add("2fe00e2c0591ecd4b9abee963373c9a7", 1);
                 // Note: spells need to be added before this, because it adds metamagics.
@@ -56,7 +57,9 @@ namespace EldritchArcana
                 SafeLoad(MagicFeats.Load, "Magic feats");
 
                 // Note: needs to run after arcane spells (it uses some of them).
-                SafeLoad(Bloodlines.Load, "Bloodlines");
+
+                if (Main.settings?.DrawbackForextraTraits == true) {SafeLoad(Bloodlines.Load, "Bloodlines"); }
+                
 
                 //SafeLoad(WarpriestClass.Load, "warpriest");   
                 //Main.settings.DrawbackForextraTraits
@@ -67,7 +70,7 @@ namespace EldritchArcana
                 // they allow qualifying for racial prerequisites.
                 SafeLoad(FavoredClassBonus.Load, "Favored class bonus, deity selection");
 
-                SafeLoad(ArcanistClass.Load, "Arcanist");
+                //SafeLoad(ArcanistClass.Load, "Arcanist");
                 //after favored class so it does not show up
                 SafeLoad(Traits.Load, "Traits");
 
@@ -75,16 +78,23 @@ namespace EldritchArcana
                 SafeLoad(PrestigiousSpellcaster.Load, "Prestigious Spellcaster");
 
                 // Note: needs to run after we create Favored Prestige Class above.
-                //SafeLoad(WarpriestClass.Load, "Arcane Savant");
+                //SafeLoad(ArcaneSavantClass.Load, "Arcane Savant");
+
+
+                // Note: needs to run after we create Favored Prestige Class above.
+                SafeLoad(Deities.create, "Additional gods");
 
                 //SafeLoad(WarpriestClass.Load, "warpriest");                
                 //SafeLoad(ArcanistClass.Load, "Arcanist");
 
                 // Note: needs to run after things that add bloodlines.
-                SafeLoad(CrossbloodedSorcerer.Load, "Crossblooded Sorcerer");
+                if (Main.settings?.DrawbackForextraTraits == true) {SafeLoad(CrossbloodedSorcerer.Load, "Crossblooded Sorcerer"); }
+
 
                 // Note: needs to run after things that add martial classes or bloodlines.
-                SafeLoad(EldritchHeritage.Load, "Eldritch Heritage");
+                if(Main.settings?.DrawbackForextraTraits == true) { SafeLoad(EldritchHeritage.Load, "Eldritch Heritage"); }
+
+                    
 
                 // Note: needs to run after crossblooded and spontaneous caster classes,
                 // so it can find their spellbooks.
@@ -107,7 +117,7 @@ namespace EldritchArcana
 
         internal static Settings settings;
 
-        static string testedGameVersion = "2.0.6";
+        static string testedGameVersion = "2.1.5d";
 
         static PortraitLoader portraitLoader;
 
@@ -123,7 +133,7 @@ namespace EldritchArcana
             if (UberLogger.Logger.Enabled) return;
 
             // Code taken from GameStarter.Awake(). PF:K logging can be enabled with command line flags,
-            // but when developing the mod it's easier to force it on.
+            // but when developing the mod it's easier to force it on.s
             var dataPath = ApplicationPaths.persistentDataPath;
             Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
             UberLogger.Logger.Enabled = true;
@@ -342,12 +352,18 @@ namespace EldritchArcana
                 "Show custom portraits in the portrait list at character creation (if changed, requires restart)", fixedWidth);
 
             settings.CheatCustomTraits = GUILayout.Toggle(settings.CheatCustomTraits,
-                "Enable choosing extra cheat traits,spells(if changed, requires restart for changes to show up)", fixedWidth);
+                "Enable Show alll traits,spells even custom and homebrew(if changed, requires restart for changes to show up)", fixedWidth);
 
 
-            string message = "Enable Picking Bloodline mutations on every bloodline class(if changed, requires new save but it doesn't work yet)";
+            //string message = "Enable Picking Bloodline mutations on every bloodline class(if changed, requires new save but it doesn't work yet)";
             settings.DrawbackForextraTraits = GUILayout.Toggle(settings.DrawbackForextraTraits,
-                "Debug logs", fixedWidth);
+                "features incompatible with call of the wild(Turn off for compatibility Call of the wild 1.57+)(if changed, requires restart)", fixedWidth);
+
+            settings.FavoredMetamagic = GUILayout.Toggle(settings.FavoredMetamagic,
+                "favored class bonus and metamagic feats", fixedWidth);
+
+            settings.HighDCl = GUILayout.Toggle(settings.HighDCl,
+                "Outlander spells gain caster level and Dc max{cheat}", fixedWidth);
 
             settings.OracleHas3SkillPoints = GUILayout.Toggle(settings.OracleHas3SkillPoints,
                 "Give Oracle class 3+int skill points on level up (instead of 4, due to condensed skills)");
@@ -406,6 +422,8 @@ namespace EldritchArcana
 
         public bool CheatCustomTraits = false;
 
+        public bool HighDCl = false;
+
         public bool DrawbackForextraTraits = true;
 
         public bool ShowCustomPortraits = false;
@@ -415,6 +433,8 @@ namespace EldritchArcana
         public bool RelaxTonguesCurse = false;
 
         public bool OracleHas3SkillPoints = true;
+
+        public bool FavoredMetamagic = true;
 
         public override void Save(UnityModManager.ModEntry modEntry)
         {

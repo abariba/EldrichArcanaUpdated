@@ -51,6 +51,7 @@ using Kingmaker.Blueprints.Items.Ecnchantments;
 using Kingmaker.RuleSystem.Rules.Damage;
 using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.Abilities.Components.Base;
+using UnityModManager = UnityModManagerNet.UnityModManager;
 
 namespace EldritchArcana
 {
@@ -306,6 +307,52 @@ namespace EldritchArcana
             return apply_buff;
         }
 
+
+        public class ModEntryCheck
+        {
+
+            UnityModManager.ModEntry modEntry;
+
+
+            public ModEntryCheck(string modId)
+            {
+                modEntry = UnityModManager.FindMod(modId);
+            }
+
+            public bool ModIsActive()
+            {
+                if (modEntry != null && modEntry.Assembly != null)
+                {
+                    return modEntry.Active;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            public bool IsInstalled()
+            {
+                if (modEntry != null)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            public string Version()
+            {
+                if (modEntry != null)
+                {
+                    return modEntry.Info.Version;
+                }
+                else
+                {
+                    return "";
+                }
+            }
+        }
 
         static internal Kingmaker.UnitLogic.Mechanics.Actions.ContextActionRandomize createContextActionRandomize(params Kingmaker.ElementsSystem.ActionList[] actions)
         {
@@ -1342,11 +1389,12 @@ namespace EldritchArcana
 
         public static void AddBattleLogMessage(string message, object tooltip = null, Color? color = null)
         {
-            var data = new LogDataManager.LogItemData(message, color ?? GameLogStrings.Instance.DefaultColor, tooltip, PrefixIcon.None);
-            if (Game.Instance.UI.BattleLogManager)
-            {
-                Game.Instance.UI.BattleLogManager.LogView.AddLogEntry(data);
-            }
+            //var data = new LogDataManager.LogItemData(message, color ?? GameLogStrings.Instance.DefaultColor, tooltip, PrefixIcon.None);
+            
+            //if (Game.Instance.UI.BattleLogManager)
+            //{
+            //    Game.Instance.UI.BattleLogManager.LogView.AddLogEntry(data);
+            //}
         }
 
 

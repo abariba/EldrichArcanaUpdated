@@ -42,6 +42,8 @@ using Kingmaker.Utility;
 using Newtonsoft.Json;
 using static Kingmaker.UI.GenericSlot.EquipSlotBase;
 using static Kingmaker.UnitLogic.Commands.Base.UnitCommand;
+using Kingmaker.Blueprints.Items;
+using static EldritchArcana.Common;
 
 namespace EldritchArcana
 {
@@ -66,7 +68,7 @@ namespace EldritchArcana
             Main.SafeLoad(DismissSpell.Load, "Ability to dismiss area effects");
 
             Main.SafeLoad(FireSpells.Load, "Fire spells");
-            Main.SafeLoad(FlySpells.Load, "Fly and Air Walk spells");
+            if (Main.settings?.DrawbackForextraTraits == true) { Main.SafeLoad(FlySpells.Load, "Fly and Air Walk spells"); }
             Main.SafeLoad(TimeStop.Load, "Time Stop");
             Main.SafeLoad(KnockAndDetectSecrets.Load, "Knock and Detect Secret Doors");
             Main.SafeLoad(LoadTrueResurrection, "True resurrection");
@@ -180,6 +182,10 @@ namespace EldritchArcana
                     c.Slot = SlotType.PrimaryHand;
                     c.DurationValue = Helpers.CreateContextDuration(rate: DurationRate.Minutes);
                 })));
+
+            //var Shambler = Helpers.CreateAbility("hoi", "shambler", "summons 1d4+2 shambling mounts", "c88b9398af66406aaa111888df308eb8", dice, AbilityType.Spell, CommandType.Standard, AbilityRange.Medium, "long", null,
+            //    );
+
             spell.CanTargetSelf = true;
             spell.NeedEquipWeapons = true;
             // Note: the paladin animation is neat, but it's very long.
@@ -207,17 +213,25 @@ namespace EldritchArcana
             //var kalike = library.Get<BlueprintAbility>("5cb0f13fc0eef464993b2e082f186032");//SwitchTo_Kalikke_Ability.
             //var kanerah = library.Get<BlueprintAbility>("fb96d35da88acb1498dc51a934f6c4d5");//SwitchTo_Kanerah_Ability.
             var camo = library.Get<BlueprintAbility>("b26a123a009d4a141ac9c19355913285");//camoflage
+            var GobIcon = Image2Sprite.Create("Mods/EldritchArcana/sprites/summon_goblins.png");
             //TestSummonAbility.1909400d0731ae049ac62edade91c1f7//summon 6 goblins
 
-
+            //scaleXP = new ModEntryCheck("ScaleXP");
+            //craftMagicItems = new ModEntryCheck("CraftMagicItems");
+            
+            
             //var spell = library.CopyAndAdd(summonMonsterIXd4plus1, "Wildhunt", SummonWildhuntId);
             var GoblinSpell = library.CopyAndAdd(GoblinSummonSix, "GoblinSummonSix", SummonGoblinSixId);//
+            GoblinSpell.AddComponent(Helpers.CreateSpellComponent(SpellSchool.Conjuration));
+            Lazy<BlueprintItem> shortSword = new Lazy<BlueprintItem>(() => library.Get<BlueprintItem>("f717b39c351b8b44388c471d4d272f4e"));
+            GoblinSpell.MaterialComponent.Item = shortSword.Value;
+            GoblinSpell.MaterialComponent.Count = 1;
             var SquirrelSpell = library.CopyAndAdd(SummonSpecial, "Squirrelhorde", SummonSquirrelId);
-            SquirrelSpell.SetNameDescription("Summon Swarm squirrels",
+            SquirrelSpell.SetNameDescription("Summon Swarm Squirrels",
                 "You summon a swarm of Squirrels, which attacks all other creatures within its area. (You may summon the swarm so that it shares the area of other creatures.) If no living creatures are within its area, the swarm attacks or pursues the nearest creature as best it can. The caster has no control over its target or direction of travel.");
-            GoblinSpell.SetNameDescription("Summon six goblins",
+            GoblinSpell.SetNameDescription("Summon Six Goblins",
                             "This spell summons to your side a sextuple band of goblin creatures. The summoned band appears where you designate and acts immediately, on your turn. It attacks your opponents to the best of its ability. If you can communicate with the creature, you can direct it not to attack, to attack particular enemies, or to perform other actions as you command.");
-            GoblinSpell.SetIcon(camo.Icon);
+            GoblinSpell.SetIcon(GobIcon);
             //var spell2 = library.CopyAndAdd(kalike, "kalikesw", "5cc0f13fc0eef464993b2e082f186033");
             //var spell3 = library.CopyAndAdd(kanerah, "kanerahsw", "5db0f13fc0eef464993b2e082f186034");
             //Helpers.
@@ -232,6 +246,16 @@ namespace EldritchArcana
             GoblinSpell.AddToSpellList(Helpers.wizardSpellList, 2);
             GoblinSpell.AddToSpellList(Helpers.bardSpellList, 2);
             GoblinSpell.AddToSpellList(Helpers.druidSpellList, 2);
+            /*
+            var CallOfTheWild = new ModEntryCheck("CallOfTheWild");
+            if (CallOfTheWild.IsInstalled())
+            {
+                Log.Write("Call of the wild detected by eldricharcana adding spells to witch");
+                var witchSpellBook = library.Get<BlueprintSpellbook>("be5817bb59c14526a99877f8a7f15d31");
+                GoblinSpell.AddToSpellList(witchSpellBook.SpellList,2);
+                SquirrelSpell.AddToSpellList(witchSpellBook.SpellList, 3);
+            }
+            */
         }
 
         static void LoadTrueResurrection()

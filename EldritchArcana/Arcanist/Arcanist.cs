@@ -35,7 +35,7 @@ namespace EldritchArcana
         static LibraryScriptableObject library => Main.library;
         internal static BlueprintCharacterClass arcanist;
         internal static BlueprintCharacterClass[] arcanistArray;
-        internal static BlueprintFeature arcanistCantrips;
+        //internal static BlueprintFeature arcanistCantrips;
         static internal BlueprintFeature Arcanist_reservoir;
 
 
@@ -278,7 +278,7 @@ namespace EldritchArcana
                                              "0dc32000b6e056d42a8ecc9921dd43c1",
                                              Helpers.NiceIcons(3),
                                              null
-                                             );
+                                             );//
             //resource.SetIncreasedByStat(3, StatType.SkillKnowledgeArcana);
             resource.SetIncreasedByLevel(3, 1,new BlueprintCharacterClass[] { arcanist });
 

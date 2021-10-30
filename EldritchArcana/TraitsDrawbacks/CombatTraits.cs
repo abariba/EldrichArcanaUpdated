@@ -51,7 +51,7 @@ namespace EldritchArcana
             choices.Add(Helpers.CreateFeature("AnatomistTrait", "Anatomist",
                 "You have studied the workings of anatomy, either as a student at university or as an apprentice mortician or necromancer. You know where to aim your blows to strike vital organs.\nBenefit: You gain a +1 trait bonus on all rolls made to confirm critical hits.",
                 "69245ef4b4ba44ddac917fc2aa10fbad",
-                Helpers.GetIcon("f4201c85a991369408740c6888362e20"), // Improved Critical
+                Image2Sprite.Create("Mods/EldritchArcana/sprites/anatomist.png"), // Improved Critical
                 FeatureGroup.None,
                 Helpers.Create<CriticalConfirmationBonus>(a => { a.Bonus = 1; a.Value = 0; })));
 
@@ -60,7 +60,7 @@ namespace EldritchArcana
                 "94d526372a964b6db97c64291a3cb846",
                 Helpers.GetIcon("3bc6e1d2b44b5bb4d92e6ba59577cf62"), // Armor Focus (light)
                 FeatureGroup.None,
-                Helpers.Create<ArmorCheckPenaltyIncrease>(a => a.Bonus = -1)));
+                Helpers.Create<ArmorCheckPenaltyIncrease>(a => a.Bonus = 1)));
 
             var rageResource = Traits.library.Get<BlueprintAbilityResource>("24353fcf8096ea54684a72bf58dedbc9");
             choices.Add(Helpers.CreateFeature("BerserkerOfTheSocietyTrait", "Berserker of the Society",
@@ -71,7 +71,8 @@ namespace EldritchArcana
                 rageResource.CreateIncreaseResourceAmount(3)));
 
             choices.Add(Helpers.CreateFeature("BladeOfTheSocietyTrait", "Blade of the Society",
-                "You have studied and learned the weak spots of many humanoids and monsters.\nBenefit: you are able to sneak attack at level 3 and You gain a +1 trait bonus to damage rolls from sneak attacks.",
+                "You have studied and learned the weak spots of many humanoids and monsters." +
+                "\nBenefit: you are able to sneak attack at level 3 even if your class normaly does not and You gain a +1 trait bonus to damage rolls from sneak attacks.",
                 "ff8c90626a58436997cc41e4b121be9a",
                 Helpers.GetIcon("9f0187869dc23744292c0e5bb364464e"), // Accomplished Sneak Attacker
                 FeatureGroup.None,

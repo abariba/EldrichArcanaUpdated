@@ -45,17 +45,19 @@
   </ItemGroup>
   <PropertyGroup>
     <PostBuildEvent>
-    xcopy /y "D:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\pathfinder-mods-1.0.2.1\\EldritchArcana\bin\Debug\net471\EldritchArcana.dll" "D:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\Mods\EldritchArcana"
-    xcopy /y "D:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\pathfinder-mods-1.0.2.1\\EldritchArcana\Info.json" "D:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\Mods\EldritchArcana"
-    xcopy /y "D:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\pathfinder-mods-1.0.2.1\\EldritchArcana\Testing\baseline_assets.txt" "D:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\Mods\EldritchArcana"
-    xcopy /y "D:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\pathfinder-mods-1.0.2.1\\EldritchArcana\CHANGELOG.md" "D:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\Mods\EldritchArcana"</PostBuildEvent>
+    xcopy /y "F:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\pathfinder-mods-1.0.2.1\\EldritchArcana\bin\Debug\net471\EldritchArcana.dll" "F:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\Mods\EldritchArcana"
+    xcopy /y "F:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\pathfinder-mods-1.0.2.1\\EldritchArcana\Info.json" "F:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\Mods\EldritchArcana"
+    xcopy /y "F:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\pathfinder-mods-1.0.2.1\\EldritchArcana\Testing\baseline_assets.txt" "F:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\Mods\EldritchArcana"
+    xcopy /y "F:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\pathfinder-mods-1.0.2.1\\EldritchArcana\CHANGELOG.md" "F:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\Mods\EldritchArcana"
+    ::xcopy /y "F:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\pathfinder-mods-1.0.2.1\\EldritchArcana\Images_sprites" "F:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\Mods\EldritchArcana\sprites"
+</PostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="0Harmony12">
-      <HintPath>..\..\Kingmaker_Data\Managed\0Harmony12.dll</HintPath>
+      <HintPath>..\..\Kingmaker_Data\Managed\UnityModManager\0Harmony12.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\Kingmaker_Data\Managed\Assembly-CSharp.dll</HintPath>
@@ -69,11 +71,16 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\Kingmaker_Data\Managed\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="UnityEngine.AnimationModule">
       <HintPath>..\..\Kingmaker_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\..\Kingmaker_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule">
+      <HintPath>..\..\Kingmaker_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
       <HintPath>..\..\Kingmaker_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>

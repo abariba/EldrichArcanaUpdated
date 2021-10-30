@@ -71,15 +71,44 @@ namespace EldritchArcana
             choices.Add(metamagicApprentice);
 
 
+            choices.Add(Helpers.CreateFeature("BlightedTrait", "Blighted Physiology",
+                "Exposure to corruption has altered your body causing you to sprout horrific growths beneath your skin." +
+                "\nBenefit: You gain a +1 natural armor bonus to AC, but your body does not work as a normal creature’s would. Anytime you receive magical healing you heal 1 hp less per die.",
+                "c50bdfaad65b4028884dd4a74f14e792",
+                Image2Sprite.Create("Mods/EldritchArcana/sprites/anatomist.png"),
+                FeatureGroup.None,
+                Helpers.CreateAddStatBonus(StatType.AC, 1, ModifierDescriptor.NaturalArmor),
+                Helpers.Create<FeyFoundlingLogic>(s => { s.dieModefier = -1; s.flatModefier = 0; })));
+
+            choices.Add(Helpers.CreateFeature("WanderlustTrait", "Wanderlust",
+                "Your childhood was brightened by the new places you constantly saw as you traveled with your parents, who were merchants. Still excited by travel, you gain great energy when traveling overland." +
+                "\nBenefit: Treat your base land speed as 10 feet higher when determining your overland speed.",
+                "d40bdfaad65b4028884dd4a74f14e793",
+                Helpers.NiceIcons(0),
+                FeatureGroup.None,
+                Helpers.CreateAddStatBonus(StatType.Speed, 10, ModifierDescriptor.Insight)));
+
+
+
 
             var dagger = Traits.library.Get<BlueprintWeaponType>("07cc1a7fceaee5b42b3e43da960fe76d");
 
             var riverrat = Traits.CreateAddStatBonus("DaggerboyTrait", "River Rat (Marsh or River)",
-                "You learned to swim right after you learned to walk. When you were a youth, a gang of river pirates put you to work swimming in nighttime rivers and canals with a dagger between your teeth so you could sever the anchor ropes of merchant vessels. \n Benefit: You gain a +1 trait bonus on damage rolls with a dagger and a +1 trait bonus on Swim(atletics is class skill) checks. and you start with a dagger",
+                "You learned to swim right after you learned to walk. When you were a youth, a gang of river pirates put you to work swimming in night-time rivers. And canals with a dagger between your teeth so you could sever the anchor ropes of merchant vessels. \n Benefit: You gain a +1 trait bonus on damage rolls with a dagger and a +1 trait bonus on Swim(atletics is class skill) checks. and you start with a dagger.",
                 "e16eb56b2f964321a29976226dccb39f",
                 StatType.SkillAthletics // strongman
 
                 );
+
+
+            choices.Add(Helpers.CreateFeature("JungleGuardTrait", "Sargavan Guard(jungle)",
+                "You served in the Sargavan Guard, either as a colonial sub-praetor or as a native Mwangi regular, and have grown accustomed to marching in hot temperatures while wearing armor.\nBenefit: When you wear armor of any sort, reduce that suit’s armor check penalty by 1, to a minimum check penalty of 0.",
+                "94d526372a964b6db97c64291b2cb426",
+                Helpers.GetIcon("3bc6e1d2b44b5bb4d92e6ba59577cf62"), // Armor Focus (light)
+                FeatureGroup.None,
+                Helpers.Create<ArmorCheckPenaltyIncrease>(a => a.Bonus = 1)));
+
+            //riverrat.Icon = Helpers.NiceIcons(38);
             /*
             var riverratextra = Helpers.CreateFeature("AtleticsTrait", "Swimmer",
                 "Your swimming made you athletic",
@@ -97,6 +126,7 @@ namespace EldritchArcana
                 //Helpers.Create<WeaponCategoryAttackBonus>(a => { a.Category = WeaponCategory.Dagger; a.AttackBonus = 1; })
                 );
                 */
+
             riverrat.AddComponent(Helpers.Create<WeaponTypeDamageBonus>(a => { a.WeaponType = dagger; a.DamageBonus = 1; }));
             riverrat.AddComponent(Helpers.Create<AddStartingEquipment>(a =>
             {
@@ -105,6 +135,7 @@ namespace EldritchArcana
                 a.BasicItems = Array.Empty<BlueprintItem>();
             }));
             choices.Add(riverrat);
+            //WeaponCategoryAttackBonus
 
             choices.Add(Helpers.CreateFeature("EmpathicDiplomatTrait", "Empathic Diplomat",
                 "You have long followed the path of common sense and empathic insight when using diplomacy. \n" +
@@ -118,7 +149,96 @@ namespace EldritchArcana
                     x.StatTypeToReplaceBastStatFor = StatType.SkillPersuasion;
                     x.NewBaseStatType = StatType.Wisdom;
                 })));
-            
+
+            var BruisingInt = Traits.CreateAddStatBonus("BruisingIntellectTrait", "Bruising Intellect",
+               "Your sharp intellect and rapier-like wit bruise egos. \n" +
+                "Benefits: Intimidate is always a class skill for you, and you may use your Intelligence modifier when making Intimidate checks instead of your Charisma modifier.",
+                "b222b5e69db44cdd88983985e37a6d2f",
+                StatType.SkillPersuasion
+                );
+
+            BruisingInt.AddComponent(Helpers.Create<ReplaceBaseStatForStatTypeLogic>(x =>
+            {
+                x.StatTypeToReplaceBastStatFor = StatType.SkillPersuasion;
+                x.NewBaseStatType = StatType.Intelligence;
+            }));
+
+            choices.Add(BruisingInt);
+
+
+            var Education = Helpers.CreateFeatureSelection("BalancedEducationTrait", "Balanced Education",
+                 "Your upbringing focused on strengthening mind and body in equal measure.\n" +
+                 "Benefit: You can exchange ability modifiers between the following pairings: Strength with Intelligence, Dexterity with Wisdom, and Constitution with Charisma.",
+                 "2d6dc2bca4e158cdaf2cd4c643249bc4",
+                 Image2Sprite.Create("Mods/EldritchArcana/sprites/spell_perfection.png"),
+                 FeatureGroup.None);
+
+            var EducationOptions = new BlueprintFeature[11];
+            var icons = new int[] { 24, 48 };
+            var Difforhumans = new string[]
+            {
+                "Use Magic Device",
+                "Persuasion",
+                "Lore Nature",
+                "Lore Religion",
+                "Perception",
+                "Knowledge Arcana",
+                "Knowledge World",
+                "Stealth",
+                "Trickery",
+                "Mobility",
+                "Athletics",
+
+            };
+
+
+
+            var Stats = new StatType[] {
+                StatType.SkillUseMagicDevice,
+                StatType.SkillPersuasion,
+                StatType.SkillLoreNature,
+                StatType.SkillLoreReligion,
+                StatType.SkillPerception,//5
+                StatType.SkillKnowledgeArcana,
+                StatType.SkillKnowledgeWorld,//7
+                StatType.SkillStealth,
+                StatType.SkillThievery,
+                StatType.SkillMobility,//10
+                StatType.SkillAthletics//11
+            };
+            var Moddefiers = new StatType[]
+            {
+                StatType.Constitution,
+                StatType.Constitution,
+                StatType.Dexterity,
+                StatType.Dexterity,
+                StatType.Dexterity,//5
+                StatType.Strength,
+                StatType.Strength,//7
+                StatType.Wisdom,
+                StatType.Wisdom,
+                StatType.Wisdom,
+                StatType.Intelligence//11
+
+            };
+            for (int i = 0; i < Stats.Length; i++)
+            {
+                EducationOptions[i] = Helpers.CreateFeature($"BalancedEducationTrait{Stats[i]}", $"Use {Moddefiers[i]} for calculating {Difforhumans[i]}",
+                    "you can draw on this training to apply a physical ability modifier to a skill check instead of its usual mental ability modifier, or apply a mental ability modifier to a skill check instead of its usual physical ability modifier.\n" +
+                    $"Benefit: You modify your {Difforhumans[i]} using your {Moddefiers[i]} modifier.",
+                    $"a985f6e69db24c7d889b39{i+15}e37a6c1b",
+                    Helpers.GetSkillFocus(Stats[i]).Icon,
+                    FeatureGroup.None,
+                    Helpers.Create<ReplaceBaseStatForStatTypeLogic>(x =>
+                    {
+                        x.StatTypeToReplaceBastStatFor = Stats[i];
+                        x.NewBaseStatType = Moddefiers[i];
+                    })
+                    );
+            }
+            Education.SetFeatures(EducationOptions);
+            choices.Add(Education);
+
 
             choices.Add(UndoSelection.Feature.Value);
             regionalTraits.SetFeatures(choices);

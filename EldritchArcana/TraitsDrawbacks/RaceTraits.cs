@@ -76,6 +76,56 @@ namespace EldritchArcana
             // - Shield Bearer (+1 dmg shield bash)
             // - Superstitious (+1 save arcane spells)
             // - World Traveler (choose: persuasion, perception, or world)
+            //e62f392949c24eb4b8fb2bc9db4345e3 // cleric orisons
+            // IllusionMirrorImageAbility.62a04a20dcd3067468565f89e3d7c687/
+            //TrickeryDomainBaseFeature.cd1f4a784e0820647a34fe9bd5ffa770  /// copycat
+            //TrickeryDomainBaseResource.148c9ad7e47f4284b9c3686bb440c08c
+            //ring of radiant arrows 3 arcane missles
+            //blessed signet ring 3 times bless
+            //MesmerizingNecklaceFeature.6fbea605b47e3354481683233511051b 3 times color spray
+            //var copycatresource = Traits.library.Get<BlueprintAbilityResource>("148c9ad7e47f4284b9c3686bb440c08c");
+
+            var ring1 = Traits.library.Get<BlueprintItem>("7829052aa5f0b57409dbef0fbc413682");
+            var ring2 = Traits.library.Get<BlueprintItem>("4421a45952e4f2a40a11c1f409fe2e13");
+
+
+            var triflerDescription = "A childhood spent at your mystically gifted grandmother’s side has taught you the basics of real magic.";
+            var trifler = Helpers.CreateFeature("TriflerTrait", "Trifler (grandma)",
+                triflerDescription + "\nBenefits: You start the game with 2 rings that can cast level 1 spells 3 times. bless and arcane missle",
+                "ecacfccfddfe456cafc8d60fc1db7d34",
+                ring1.Icon, 
+                FeatureGroup.None, Helpers.Create<AddStartingEquipment>(a =>
+                {
+                    a.CategoryItems = Array.Empty<WeaponCategory>();
+                    a.RestrictedByClass = Array.Empty<BlueprintCharacterClass>();
+                    a.BasicItems = new BlueprintItem[] { ring1, ring2 };
+                }));
+
+
+            choices.Add(trifler);
+
+            //var colorspray = Traits.library.CopyAndAdd<BlueprintFeature>(
+            //    "6fbea605b47e3354481683233511051b",
+            //    "TriflerTraitColorspray",
+            //    "cd1f4a784e0b20647a34fe9bd5ffa7a0");
+            //colorspray.SetDescription(triflerDescription + "\n Benefit: You may cast color spray 3 times per day as a spell-like ability.");
+            //colorspray.SetName("Trifler color spray");
+
+            //var colorspray = Traits.library.CopyAndAdd<BlueprintFeature>(
+            //    "cd1f4a784e0820647a34fe9bd5ffa770",
+            //    "TriflerTraitColorspray",
+            //    "6fbea605b47e3354481683233511051b");
+            //colorspray.SetDescription(triflerDescription + "\n Benefit: You may cast color spray 3 times per day as a spell-like ability.");
+            //colorspray.SetName("Trifler color spray");
+
+            //var TriflerFeatures = new List<BlueprintFeature>()
+            //{
+            //    colorspray
+            //};
+
+            //choices.Add(trifler);
+            //choices.Add(colorspray);
+
 
             var components = new List<BlueprintComponent> { humanReq };
             components.Add(Helpers.CreateAddStatBonus(StatType.SaveWill, 1, ModifierDescriptor.Trait));
@@ -174,13 +224,28 @@ namespace EldritchArcana
                 "Art for you is a social gateway and you use it to influence and penetrate high society.",
                 "ac5a16e72ef74b4884c674dcbb61692c", StatType.SkillPersuasion, elfReq));
 
+            BlueprintItemWeapon bite = Traits.library.CopyAndAdd<BlueprintItemWeapon>("35dfad6517f401145af54111be04d6cf", "Tusked",
+                "44dfad6517f401145af54111be04d644");
+            
+                
+
             choices.Add(Helpers.CreateFeature("ForlornTrait", "Forlorn (Elf)",
                 "Having lived outside of traditional elf society for much or all of your life, you know the world can be cruel, dangerous, and unforgiving of the weak.\nBenefit: You gain a +1 trait bonus on Fortitude saving throws.",
                 "1511289c92ea4233b14c4f51072ea10f",
                 Helpers.GetIcon("79042cb55f030614ea29956177977c52"), // Great Fortitude
                 FeatureGroup.None,
                 elfReq,
-                Helpers.CreateAddStatBonus(StatType.SaveFortitude, 1, ModifierDescriptor.Trait)));
+                Helpers.CreateAddStatBonus(StatType.SaveFortitude, 1, ModifierDescriptor.Trait)
+                ));
+
+            choices.Add(Helpers.CreateFeature("TuskedTrait", "Tusked (Half-orc)",
+                "Benefit: Huge, sharp tusks bulge from your mouth, and you receive a bite attack (1d4 damage for Medium characters). If used as part of a full attack action, the bite attack is made at your full base attack bonus –5.",
+                "1511289c92ea4233b14c4f51072ea09g",
+                Image2Sprite.Create("Mods/EldritchArcana/sprites/halforc_tusked.png"), // Great Fortitude
+                FeatureGroup.None,
+                halfOrcReq,
+                Helpers.Create<AddAdditionalLimb>(x => x.Weapon = bite)
+                ));
 
             choices.Add(Helpers.CreateFeature("WarriorOfOldTrait", "Warrior of Old (Elf)",
                 "As a child, you put in long hours on combat drills, and though time has made this training a dim memory, you still have a knack for quickly responding to trouble.\nBenefit: You gain a +2 trait bonus on initiative checks.",
@@ -207,10 +272,47 @@ namespace EldritchArcana
             brute.SetIcon(Helpers.GetIcon("885f478dff2e39442a0f64ceea6339c9")); // Intimidating
             choices.Add(brute);
 
+            var GloryOfOld = Helpers.CreateFeature("GloryOfOldTrait", "Glory of old",
+                "You are part of the old Guard" +
+                "\nYou belong to the elite veteran regiments of The old king and his army and are intensely loyal to him. It was you who made the last charge at the dwarven kingdom." +
+                "Benefit: You receive a +1 trait bonus on saving throws against spells, spell-like abilities, and poison",
+                "4283a523984f44944a7cf157b21bf7c9",
+                Image2Sprite.Create("Mods/EldritchArcana/sprites/spell_perfection.png"),
+                FeatureGroup.None,
+                dwarfReq,                
+                Helpers.Create<SavingThrowBonusAgainstDescriptor>(s => { s.SpellDescriptor = SpellDescriptor.Poison; s.Value = 1; s.ModifierDescriptor = ModifierDescriptor.Racial; }),
+                Helpers.Create<SavingThrowBonusAgainstDescriptor>(s => { s.SpellDescriptor = SpellDescriptor.BreathWeapon; s.Value = 1; s.ModifierDescriptor = ModifierDescriptor.Trait; }));
+            components.Clear();
+            components.AddRange((new SpellSchool[]
+            {
+                SpellSchool.Abjuration,
+                SpellSchool.Conjuration,
+                SpellSchool.Divination,
+                SpellSchool.Enchantment,
+                SpellSchool.Evocation,
+                SpellSchool.Illusion,
+                SpellSchool.Necromancy,
+                SpellSchool.Transmutation,
+                SpellSchool.Universalist
+            }).Select((school) => Helpers.Create<SavingThrowBonusAgainstSchool>(a =>
+            {
+                a.School = school;
+                a.Value = 1;
+                a.ModifierDescriptor = ModifierDescriptor.Racial;
+            })));
+
+            GloryOfOld.AddComponents(components);
+
+            choices.Add(GloryOfOld);
+
+
+
+
+
             choices.Add(Helpers.CreateFeature("LegacyOfSandTrait", "Legacy of Sand (Half-Orc)",
                 "A large tribe of orcs adapted to life in the desert once dwelt in southeastern Katapesh. Although this tribe is long extinct, some half-orcs of Katapesh carry the traits of this tribe in their particularly large jaws, broad shoulders, and shockingly pale eyes. You often have dreams of hunts and strange ceremonies held under moonlight in the desert sands. Some ascribe these dreams to racial memory, others to visions or prophecies. These dreams have instilled in you a fierce sense of tradition.\nBenefit: You gain a +1 trait bonus on all Will saving throws.",
                 "e5fb1675eb6e4ef9accef7eb3a10862a",
-                Helpers.GetIcon("175d1577bb6c9a04baf88eec99c66334"), // Iron Will
+                Image2Sprite.Create("Mods/EldritchArcana/sprites/halforc_legacy_of_sand.png"),
                 FeatureGroup.None,
                 halfOrcReq,
                 Helpers.CreateAddStatBonus(StatType.SaveWill, 1, ModifierDescriptor.Trait)));
@@ -259,8 +361,8 @@ namespace EldritchArcana
                 Helpers.GetIcon("3a8d34905eae4a74892aae37df3352b9"), // Skill Focus Stealth (mobility)
                 FeatureGroup.None,
                 dwarfReq,
-                Helpers.CreateAddStatBonus(StatType.SkillMobility, 2, ModifierDescriptor.Trait),
-                Helpers.CreateAddStatBonus(StatType.SaveReflex, 1, ModifierDescriptor.Trait)));
+                Helpers.CreateAddStatBonus(StatType.SkillMobility, 2, ModifierDescriptor.Racial),
+                Helpers.CreateAddStatBonus(StatType.SaveReflex, 1, ModifierDescriptor.Racial)));
 
             choices.Add(Traits.CreateAddStatBonus("MilitantMerchantTrait", "Militant Merchant (Dwarf)",
                 "You know what it takes to get your goods to market and will stop at nothing to protect your products. Years of fending off thieves, cutthroats, and brigands have given you a sixth sense when it comes to danger.",
@@ -274,23 +376,16 @@ namespace EldritchArcana
                 dwarfReq,
                 Helpers.Create<CriticalConfirmationBonus>(a => { a.Bonus = 1; a.Value = 0; })));
 
-            var dwarfy = new BlueprintComponent[64];
-            for(int i = 1; i < 65; i++)
-            {
-                dwarfy[i-1] = Helpers.CreateAddStatBonusOnLevel(StatType.HitPoints, i * 2, ModifierDescriptor.Trait, i);
-            };
-            //var scale = Helpers.Create<BuffScaling>(a => { a.TypeOfScaling = BuffScaling.ScalingType.ByLevel; a.StartingMod = 1; });
-            //var x = BuffScaling.ScalingType.ByLevel;
-            //dwarfy;
-            var bulkybattleborn = Helpers.CreateFeature("BulkyAfTrait", "Bulky Battleborn (Dwarf)",
-                "Your greatest joy is being in the thick of battle and taking hits for the team, \nBenefit:5 extra hitpoints at level 1 and you gain 2 extra hitpoints per level thereafter",
-                "a987f5e69db44cdd99983985e37a6c3b",
+            
+            var Frostborn = Helpers.CreateFeature("FrostbornTrait", "Frostborn (Dwarf)",
+                "You were raised in the icy tundra\nBenefit:Benefit: You gain a +4 trait bonus to resist the effects of cold environments, as well as a +1 trait bonus on all saving throws against cold effects.",
+                "f987f5e69db44cdd99983985e37a6c3c",
                 Helpers.GetIcon("121811173a614534e8720d7550aae253"), // Weapon Specialization
                 FeatureGroup.None,
-                dwarfReq,
-                Helpers.CreateAddStatBonusOnLevel(StatType.HitPoints, 2, ModifierDescriptor.Racial, 3));
-            bulkybattleborn.AddComponents(dwarfy);
-            choices.Add(bulkybattleborn);
+                dwarfReq);
+            Frostborn.AddComponent(Helpers.Create<AddDamageResistanceEnergy>(r=> { r.Type = Kingmaker.Enums.Damage.DamageEnergyType.Cold; r.Value = 4; }));
+            Frostborn.AddComponent(Helpers.Create<SavingThrowBonusAgainstDescriptor>(s => { s.SpellDescriptor = SpellDescriptor.Cold; s.ModifierDescriptor=ModifierDescriptor.Racial; s.Bonus = 1; }));
+            choices.Add(Frostborn);
 
             choices.Add(Helpers.CreateFeature("ZestForBattleTrait", "Zest for Battle (Dwarf)",
                 "Your greatest joy is being in the thick of battle, and smiting your enemies for a righteous or even dastardly cause.\nBenefit: Whenever you have a morale bonus to weapon attack rolls, you also receive a +1 trait bonus on weapon damage rolls.",
@@ -347,7 +442,7 @@ namespace EldritchArcana
             choices.Add(Helpers.CreateFeature("AnimalFriendTrait", "Animal Friend (Gnome)",
                 "You’ve long been a friend to animals, and feel safer when animals are nearby.\nBenefits: You gain a +1 trait bonus on Will saving throws as long as you have an animal companion or familiar, and Lore (Nature) is always a class skill for you.",
                 "91c612b225d54adaa4ce4c633501b58e",
-                Helpers.GetIcon("1670990255e4fe948a863bafd5dbda5d"), // Boon Companion
+                Image2Sprite.Create("Mods/EldritchArcana/sprites/gnome_animal_friend.png"),//Helpers.GetIcon("1670990255e4fe948a863bafd5dbda5d"), // Boon Companion
                 FeatureGroup.None,
                 components.ToArray()));
 

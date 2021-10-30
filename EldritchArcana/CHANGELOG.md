@@ -3,13 +3,283 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+ 
+
+##[2.0.1]
+
+### Added
+- Deity Achaekek
+
+### Changed
+- Mod manager version to 22
+
+### Fixed
+- Duplicate asset id conflicts
+
+### Removed
+- Couple of debug messages
+
+
+##[2.0.0]
+
+### Changed 
+ -set version to 2
+### Fixed 
+    couple of minor bugs
+
+## [1.3.5]
+
+### Added
+-family heirloom weapons all weapons starting with 'gh and 'i'
+-Cargavan Guard trait
+
+### Changed
+
+
+### Fixed
+
+
+## [1.3.4]
+
+### Added
+-family heirloom weapons all weapons starting with 'E and 'F'
+
+### Changed
+-Gambler spells - spell levels 1-3 -> 1-7
+
+### Fixed
+-clever wordplay glitch
+
+## [1.3.3]
+
+### Added
+-family heirloom weapons all weapons starting with 'C and D'
+-family heirloom great axe
+-gambler trait option to choose a random spell that gives metamagic -2 cl and dc + 2
+-balanced education
+
+### Changed
+-cruelty - flanked damage bonus 4->1
+
+
+## [1.3.2]
+
+### Added
+-family heirloom  weapons all weapons starting with 'B'
+-Some gambler trait options
+-An option to disable all incompatible functions with the call of the wild 1.56+
+-An option to disable metamagic feats and favored class
+
+### Changed
+-cruelty description
+
+### Fixed
+- incompatibility crash with the call of the wild 1.56+
+
+### Removed
+- Log file menu option(the menu is getting crowded)
+
+## [1.3.1]
+
+### Added
+-family heirloom  Greatclub
+
+### Changed
+-added error handling to prestigious spellcaster
+-armor expert
+
+### Fixed
+-wisdom in the flesh
+
+## [1.3.0]
+
+### Added
+-famly heirloom shortsword
+
+### Changed
+-(divine miracle)->Miracle ,Lesser
+
+### Fixed
+-exalted of society(now adds one channel energy for paladins as well)
+
+## [1.2.9]
+
+### Added
+-some family heirloom weapons
+-Avid reader
+
+### Changed
+-Dragon disciple fix(Still busy fixing)
+
+## [1.2.8]
+
+### Fixed
+-Dragon disciple acting weird(hotfix still working on a permanent solution)
+
+## [1.2.7]
+
+### Added
+-some family heirloom weapons
+
+### Changed
+-spelling:https://imgur.com/gallery/hfL1VbI.
+-Icons for some meta magic feats
+
+### Fixed
+-Prestigious spell caster to work with classes from other mods Thanks to Blindhamsters help
+
+
+## [1.2.6]
+
+### Added
+-composite longbow flail and dwarven waraxe, bastard sword rapier hand crossbow as an heirloom weapon.
+-Extra options for the well-provisioned adventurer.
+-An early adaptation of the roll with it feat for goblins
+
+### Changed
+-Gambler trait has 2 random options normally but has all of them if you select to be able to select custom traits.
+
+### Fixed
+-No more errors for emergency force sphere
+
+## [1.2.5]
+
+### Added
+-More Icons Made by Nolanoth for spells traits and feats in the mod.
+-fauchard and scythe as an heirloom weapon.
+-Extra options for the well-provisioned adventurer.
+-Some requested traits.
+
+### Changed
+-Gambler trait has 2 random options again instead of all of them.
+
+## [1.2.4]
+
+### Added
+-More Icons Made by Nolanoth for spells traits and feats in the mod.
+-falchion as an heirloom weapon.
+-Well provisioned adventurer Trait to equipment traits.
+-Extra options for the well-provisioned adventurer.
+
+### Changed
+-Description gambler damage -> attack rolls
+
+### Fixed
+-Sprite paths for Linux users
+
+## [1.2.3]
+
+### Added
+-scimitar as an heirloom weapon.
+-Option to make outlander spells Cl max +999999; just in case you want a spell to last a long time{cheat}
+
+### Changed
+-Garess now has the woodland stride Effect added
+-Wanderlust 5ft->10ft
+
+### Fixed
+-Frostborn spelling
+
+## [1.2.2]
+
+### Added
+-More Icons Made by Nolanoth for spells traits and feats in the mod.
+-A couple of traits
+-Equipment trait section
+
+### Changed
+-Family heirloom has been moved to equipment traits.
+
+
+## [1.2.1]
+
+### Added
+-More Icons Made by Nolanoth for spells traits and feats in the mod.
+-Frostborn dwarf trait.
+
+### Changed
+-Undeadfeature Has now also a prerequisite option Spellfocus or Spellfocus-Necromancy.
+-Summon six goblins now has a spell school and required material components.
+-Bulky battelborn Has been moved to custom traits.
+
+### Fixed
+-A lot of descriptions see list:https://imgur.com/gallery/fr7rV2A 
+Credits to Silverite for bringing them to my attention and pointing out the correct descriptions. 
+
+
+## [1.2.0]
+
+### Added
+-Icons Made by Nolanoth for spells traits and feats in the mod.
+
+### Changed
+-Drawback spell vulnerability now adds vulnerability to a fitting school. 
+-The undead feature now requires a Urgortha as a deity
+
+## [1.1.9]
+
+### Added
+-Optimistic gambler trait(extra possibilities)
+-Witches curse drawback trait
+-Undead drawback trait.
+
+### Changed
+-Drawback spell vulnerability now also adds an elemental vulnerability to each spell school. 
+-Replaced spiky shied and heavy shield with light weapons light hammer.
+
+### Fixed
+-Optimistic gambler some weapons not applying damage bonus.
+
+### Removed
+-Spiked shield and heavy spiked shield from random options and from guilty fraud
+
+## [1.1.8]
+
+### Added
+-Optimistic gambler trait(extra possibilitys)
+
+### Changed
+-Drawback spell vulnerability is -4 from -3
+-Drawback peg leg is now -2 on Initiative and -10 movement speed.
+-Only One drawback feat may be chosen per character
+
+### Fixed
+-Lebeda resource description wizzard -> wizard
+
+### Removed
+-Arcanist
+
+## [1.1.7]
+
+### Added
+-Family heirloom extra options(dagger)
+-Tusked trait
+-Glory of old trait
+-drawbackfeats(peg leg, Spell Vulnerability)
+-Optimistic gambler trait(gain a random bonus only 6 now more will be added)
+
+### Changed
+-Drawback feat frail is now -3 health at level 1 and -1 health per hit die
+-Drawback Rogarvia is now -4 on persuasion vs nobles
+-Drawback Warded against nature to be more like pnp.
+
+### Fixed
+-Lebeda resource descriptions not being understandable for some people
+
+## [1.1.6]
+
+### Added
+-Family heirloom traits with 5 options.
+-Gnomish alchemist trait.
+-Custom trait Bloodline havoc for bloodragers that want to pick blood havoc
+
 ## [1.1.5]
 
 ### Added
 -Crossblooded sorcerer can choose a bloodline mutation.
 
 ### Fixed
--Prestigious spellcaster is now being added correctly again.e
+-Prestigious spellcaster is now being added correctly again.
 
 ## [1.1.4]
 
@@ -185,7 +455,7 @@ and there is another modder already working on arcanist and he is much further. 
 - interaction between spell trait selection and a new gui feature from pathfinder kingmaker. 
 
 ## [0.9.6]
-
+ Joostjasper has taken over Updating the mod.
 ## [0.9.5]
 
 ### Added
@@ -276,6 +546,9 @@ and there is another modder already working on arcanist and he is much further. 
 
 
 future inplements;
+spiderhawk
 https://www.d20pfsrd.com/classes/base-classes/magus/archetypes/paizo-fans-united/spiderhawk
-perhaps
-arcanist
+alchemical affinity
+https://www.d20pfsrd.com/classes/core-classes/wizard/arcane-discoveries/arcane-discoveries-paizo/alchemical-affinity/
+moment of prescience.
+https://www.d20pfsrd.com/magic/all-spells/m/moment-of-prescience/

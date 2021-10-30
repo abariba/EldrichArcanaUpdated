@@ -46,7 +46,7 @@ namespace EldritchArcana
                 Helpers.GetIcon("d09b20029e9abfe4480b356c92095623"), // toughness
                 FeatureGroup.None,
                 Helpers.Create<AddHitPointOnce>());
-            bonusHitPointFeat.Ranks = 20;
+            bonusHitPointFeat.Ranks = 64;
 
             bonusSkillRankFeat = Helpers.CreateFeature("FavoredClassBonusSkillRank",
                 "Bonus Skill Rank", "Gain +1 skill rank",
@@ -54,10 +54,14 @@ namespace EldritchArcana
                 Helpers.GetIcon("3adf9274a210b164cb68f472dc1e4544"), // human skilled
                 FeatureGroup.None,
                 Helpers.Create<AddSkillRankOnce>());
-            bonusSkillRankFeat.Ranks = 20;
+            bonusSkillRankFeat.Ranks = 64;
 
-            LoadFavoredClass();
-            LoadFavoredPrestigeClass();
+            //
+            if (Main.settings.FavoredMetamagic == true) {
+                LoadFavoredClass();
+                LoadFavoredPrestigeClass();
+            }
+            
             LoadDeitySelection();
         }
 
@@ -72,7 +76,7 @@ namespace EldritchArcana
                 "You have come to favor a certain prestige class, either because you are particularly devoted to the class’s cause, have trained more than most others have for that specific role, or have simply been destined to excel in the prestige class all along. Regardless of the reason, levels gained in your favored prestige class grant additional benefits in a way similar to those you gain for taking levels in your base favored class.\n" +
                 "You can select this feat before you gain levels in your chosen favored prestige class, but the benefits of the feat do not apply until you actually gain at least 1 level in that prestige class.",
                 "4fab2e6256e644daaa637093bc2421aa",
-                Helpers.skillFocusFeat.Icon,
+                Image2Sprite.Create("Mods/EldritchArcana/sprites/favored_prestige_class.png"),
                 FeatureGroup.Feat,
                 noFeature,
                 Helpers.Create<LevelUpRecommendation>(l =>
@@ -187,7 +191,7 @@ namespace EldritchArcana
                 choices.Add(CreateFavoredClassProgression(characterClass));
             }
 
-            EventBus.Subscribe(new UpdateLevelUpDeterminatorText());
+            //EventBus.Subscribe(new UpdateLevelUpDeterminatorText());
 
             var noFeature = Helpers.PrerequisiteNoFeature(null);
             var favoredClass = Helpers.CreateFeatureSelection(
@@ -217,7 +221,9 @@ namespace EldritchArcana
             var isSorcerer = favoredClass.AssetGuid == "b3a505fb61437dc4097f43c3f8f9a4cf";
             var isBard = favoredClass.AssetGuid == "772c83a25e2268e448e841dcd548235f";
             var isOracle = favoredClass == OracleClass.oracle;
-            var isArcanist = favoredClass == ArcanistClass.arcanist;
+            //var isWizard = favoredClass.AssetGuid == "ba34257984f4c41408ce1dc2004e342e";
+            //var isHaldeen = false;
+
             var isExtraSpellClass = isSorcerer || isBard || isOracle;
             if (isExtraSpellClass)
             {
@@ -284,6 +290,7 @@ namespace EldritchArcana
             atheismFeature.AddComponents(
                 Helpers.classes.Where(c => c.GetComponents<PrerequisiteNoFeature>().Any(p => p.Feature == atheismFeature))
                     .Select(c => Helpers.Create<PrerequisiteNoClassLevel>(p => p.CharacterClass = c)));
+            atheismFeature.SetIcon(Image2Sprite.Create("Mods/EldritchArcana/sprites/atheism.png"));
 
             var deitySelection = library.CopyAndAdd(baseDeitySelection, "DeitySelectionAny", "d5c3c9d4080043f98e6c09f4e843440e");
             deitySelection.Group = FeatureGroup.None; // to prevent "determinators" page clutter.

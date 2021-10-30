@@ -52,7 +52,11 @@ namespace EldritchArcana
         internal static void Load()
         {
             // TODO: the Djinni bloodlines might be interesting. Limited Wish without material component is a neat capstone.
+            //Main.settings.DrawbackForextraTraits
+            
+            //if(Main.settings?.DrawbackForextraTraits == true) {
             Main.SafeLoad(LoadOrcBloodline, "Orc Bloodline");
+            //}
 
             Main.SafeLoad(LoadMetamagicAdept, "Metamagic Adept (Arcane Bloodline)");
         }
@@ -523,6 +527,63 @@ namespace EldritchArcana
                     Log.Write($"{GetType().Name}: remove {DazzledBuff} from {Owner.CharacterName}");
                     appliedBuff.Remove();
                     appliedBuff = null;
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Error(e);
+            }
+        }
+    }
+
+
+    public class ShadowSensitivity : OwnedGameLogicComponent<UnitDescriptor>, IWeatherChangeHandler, IAreaActivationHandler
+    {
+        internal static BlueprintBuff ShadowBuff;
+
+        [JsonProperty]
+        private Buff appliedBuff;
+
+        public void OnWeatherChange() => Apply();
+
+        public void OnAreaActivated() => Apply();
+
+        public override void OnTurnOn() => Apply();
+
+        public override void OnTurnOff()
+        {
+            appliedBuff?.Remove();
+            appliedBuff = null;
+        }
+
+        void Apply()
+        {
+            try
+            {
+                var game = Game.Instance;
+                var weather = game?.Player?.Weather?.ActualWeather;
+                var timeOfDay = game?.TimeOfDay;
+                var area = game?.CurrentlyLoadedArea;
+                // Light sensitivity: dazzled if outdoors, clear weather, morning/daytime/evening.
+                if (weather == InclemencyType.Clear && area != null && !area.IsIndoor &&
+                    // 6:00 to 18:00.
+                    (timeOfDay == TimeOfDay.Morning || timeOfDay == TimeOfDay.Day))
+                {
+                    if (appliedBuff != null)
+                    {
+                        Log.Write($"{GetType().Name}: remove {ShadowBuff} from {Owner.CharacterName}");
+                        appliedBuff.Remove();
+                        appliedBuff = null;
+                    }
+                    
+                }
+                else if (appliedBuff == null)
+                {
+                    Log.Write($"{GetType().Name}: add {ShadowBuff} to {Owner.CharacterName}");
+                    appliedBuff = Owner.AddBuff(ShadowBuff, Owner.Unit);
+                    if (appliedBuff == null) return;
+                    appliedBuff.IsNotDispelable = true;
+                    appliedBuff.IsFromSpell = false;
                 }
             }
             catch (Exception e)

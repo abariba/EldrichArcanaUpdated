@@ -46,11 +46,12 @@ namespace EldritchArcana
 
         internal static void Load()
         {
-            Main.SafeLoad(LoadLesserMiracle, "Miracle preloading");//this is neccecairy to declaire id's so the copys work.
+            Main.SafeLoad(LoadLesserMiracle, "Miracle preloading(dont worry if you see this failed to load)");//this is neccecairy to declaire id's so the copys work.
             Main.SafeLoad(LoadMiracle, "Miracle");
             Main.SafeLoad(LoadWish, "Wish");
             Main.SafeLoad(LoadLimitedWish, "Limited Wish");
             Main.SafeLoad(LoadWishFabricate, "Wish(Arcane)");
+            Log.Write("wishSPells loaded");
         }
 
         static void LoadLimitedWish()
@@ -65,7 +66,7 @@ namespace EldritchArcana
                 "• Produce any other effect whose power level is in line with the above effects, such as a single creature automatically hitting on its next attack or taking a -7 penalty on its next saving throw.\n" +
                 "A duplicated spell allows saving throws and spell resistance as normal, but the save DC is for a 7th-level spell. When a limited wish spell duplicates a spell with a material component that costs more than 1,000 gp, you must provide that component (in addition to the 1,500 gp diamond component for this spell).",
                 "9e70b011f2554c3ba0fe9060dc93fc6c",
-                Helpers.GetIcon("6f1f99b38e471fa42b1b42f7549b4210"), // geniekind
+                Image2Sprite.Create("Mods/EldritchArcana/sprites/limited_wish.png"), // geniekind
                 AbilityType.Spell,
                 CommandType.Standard,
                 AbilityRange.Personal,
@@ -146,7 +147,7 @@ namespace EldritchArcana
                 "Duplicated spells allow saves and Spell Resistance as normal (but save DCs are for 9th-level spells).\n" +
                 "When a wish duplicates a spell with a material component that costs more than 10,000 gp, you must provide that component (in addition to the 25,000 gp diamond component for this spell).",
                 "508802d7c0cb452ab7473c2e83c3f535",
-                Helpers.GetIcon("6f1f99b38e471fa42b1b42f7549b4210"), // geniekind
+                Image2Sprite.Create("Mods/EldritchArcana/sprites/wish_spell.png"),
                 AbilityType.Spell,
                 CommandType.Standard,
                 AbilityRange.Personal,
@@ -249,7 +250,7 @@ namespace EldritchArcana
                 ability.MaterialComponent.Item = diamond.Value;
                 ability.MaterialComponent.Count = 5;
                 if (i % 8 == 1) {
-                    ability.MaterialComponent.Count = Main.settings?.CheatCustomTraits == true ? -50 : 5;
+                    ability.MaterialComponent.Count = Main.settings?.HighDCl == true ? -50 : 5;
                 }/*
                 else { 
                 //ability.MaterialComponent.Item = summonedBow.Value;
@@ -310,20 +311,16 @@ namespace EldritchArcana
 
         static void LoadLesserMiracle()
         {
-            var spell = Helpers.CreateAbility("LesserMiracle", "(Divine) Miracle",
+            var spell = Helpers.CreateAbility("LesserMiracle", "Miracle, Lesser",
                 "You don’t so much cast a miracle as request one. You state what you would like to have happen and request that your deity (or the power you pray to for spells) intercede.\n" +
                 "A miracle can do any of the following things.\n" +
-                "• Duplicate any cleric spell of 8th level or lower.\n" +
-                "• Duplicate any other spell of 7th level or lower.\n" +
+                "• Duplicate any other spell of 6th level or lower.\n" +
                 "• Undo the harmful effects of certain spells, such as feeblemind or insanity.\n" +
                 "• Have any effect whose power level is in line with the above effects.\n" +
-                "Alternatively, a cleric can make a very powerful request. Casting such a miracle costs the cleric 25,000 gp in powdered diamond because of the powerful divine energies involved. Examples of especially powerful miracles of this sort could include the following:\n" +
-                "• Swinging the tide of a battle in your favor by raising fallen allies to continue fighting.\n" +
-                "• Moving you and your allies, with all your and their gear, from one plane to a specific locale through planar barriers with no chance of error.\n" +
-                "• Protecting a city from an earthquake, volcanic eruption, flood, or other major natural disaster.\n" +
                 "In any event, a request that is out of line with the deity’s (or alignment’s) nature is refused.\n" +
-                "A duplicated spell allows saving throws and spell resistance as normal, but the save DCs are as for a 9th-level spell.When a miracle spell duplicates a spell with a material component that costs more than 100 gp, you must provide that component.",
-                "2ce3676c93de461b91596ef7e4e04c13",
+                "A duplicated spell allows saving throws and spell resistance as normal, but the save DCs are as for a 6th-level spell.When a miracle spell duplicates a spell with a material component that costs more than 100 gp, you must provide that component.",
+                "be3eb41e7b4d484bbfaa83b83a98931c",
+                //"2ce3374c93de461b91596ef7e4e04c14",
                 Helpers.GetIcon("fafd77c6bfa85c04ba31fdc1c962c914"), // restoration greater
                 AbilityType.Spell,
                 CommandType.Standard,
@@ -335,20 +332,20 @@ namespace EldritchArcana
             spell.AvailableMetamagic = Metamagic.Quicken | Metamagic.Heighten | Metamagic.Empower | Metamagic.Extend | Metamagic.Maximize | Metamagic.Reach;
 
             var variants = new List<BlueprintAbility>();
-            for (int level = 1; level <= 8; level++)
+            for (int level = 1; level <= 6; level++)
             {
-                variants.Add(CreateWishForSpellLevel(spell, level, 9, isMiracle: true));
+                variants.Add(CreateWishForSpellLevel(spell, level, 6, isMiracle: true));
             }
             spell.AddComponent(spell.CreateAbilityVariants(variants));
             spell.MaterialComponent = variants[0].MaterialComponent;
 
-            variants.AddRange(CreateWishForStatBonus(spell));
+            variants.AddRange(CreateWishForStatBonus(spell,spell.AssetGuid));
             // TODO: variant for mass Resurrection (cost 25,000)
             // TODO: variant for protection from natural disasters (cost 25,000)
             // Perhaps it should prevent some of the bad kingdom effects that can happen,
             // or other quest related effects (e.g. become immune to Kingdom penalties for a time)?
-            spell.AddToSpellList(Helpers.clericSpellList, 9);
-            miracle = spell;
+            spell.AddToSpellList(Helpers.clericSpellList, 7);
+            //miracle = spell;
 
             // Miracle Scroll uses 7th level spells to offer the most choice (divine + arcane).
             Helpers.AddSpellAndScroll(spell, "d441dfae9c6b21e47ae24eb13d8b4c4b", 5); // restoration greater.

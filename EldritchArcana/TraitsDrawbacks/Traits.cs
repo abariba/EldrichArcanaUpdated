@@ -37,6 +37,9 @@ using Kingmaker.UnitLogic.FactLogic;
 using Kingmaker.UnitLogic.Mechanics;
 using Kingmaker.UnitLogic.Parts;
 using Harmony12;
+using Kingmaker.UnitLogic.Buffs.Blueprints;
+using Newtonsoft.Json;
+using Kingmaker.UnitLogic.Buffs;
 
 namespace EldritchArcana
 {
@@ -83,15 +86,16 @@ namespace EldritchArcana
                 "afb4225be98a4b3e9717883f22068c28", null, FeatureGroup.None);
             choices.Add(Skip);
             Drawbackchoices.Add(Skip);
-            var DrawbackEmotion = CreateEmotionDrawbacks();
+            var DrawbackEmotion = EmotionDrawbacks.CreateEmotionDrawbacks();
             var DrawbackPhysique = PhysiqueDrawbacks.CreatePhysiqueDrawbacks();
             Drawbackchoices.Add(DrawbackEmotion);
             Drawbackchoices.Add(DrawbackPhysique);
-            choices.Add(CombatTraits.CreateCombatTraits());
+            choices.Add(CombatTraits.CreateCombatTraits());//,choices,"combattraits");
             choices.Add(FaithTraits.CreateFaithTraits());
             choices.Add(MagicTraits.CreateMagicTraits());
             BlueprintFeatureSelection adopted;
             choices.Add(SocialTraits.CreateSocialTraits(out adopted));
+            choices.Add(EquipmentTraits.CreateEquipmentTraits());
             choices.Add(RaceTraits.CreateRaceTraits(adopted));
             choices.Add(CampaignTraits.CreateCampaignTraits());
             choices.Add(RegionalTraits.CreateRegionalTraits());
@@ -124,7 +128,7 @@ namespace EldritchArcana
                 "Additional Traits",
                 "You have more traits than normal.\nBenefit: You gain two character traits of your choice. These traits must be chosen from different lists, and cannot be chosen from lists from which you have already selected a character trait. You must meet any additional qualifications for the character traits you choose — this feat cannot enable you to select a dwarf character trait if you are an elf, for example.",
                 "02dbb324cc334412a55e6d8f9fe87009",
-                Helpers.GetIcon("0d3651b2cb0d89448b112e23214e744e"), // Extra Performance
+                Image2Sprite.Create("Mods/EldritchArcana/sprites/additional_traits.png"),//Helpers.GetIcon("0d3651b2cb0d89448b112e23214e744e"), // Extra Performance
                 FeatureGroup.Feat);
 
             var additionalTrait1 = Helpers.CreateFeatureSelection("AdditionalTraitSelection1", "Traits",
@@ -160,209 +164,7 @@ namespace EldritchArcana
             library.AddFeats(additionalTraits);
         }
        
-        static BlueprintFeatureSelection CreateEmotionDrawbacks()
-        {
-            //string[]  = new string[] { };
-            string[] EmotionGuids = new string[200];
-            //EmotionGuids = guids;
-            string baseguid = "CB54279F30DA4802833F";
-            int x = 0;
-            for (long i = 542922691494; i < 542922691644; i++)
-            {
-                EmotionGuids[x] = baseguid + i.ToString();
-                x++;
-            }
-            //int rnd = DateTime.Now.Millisecond%4;
-
-            var noFeature = Helpers.PrerequisiteNoFeature(null);
-            var EmotionDrawbacks = Helpers.CreateFeatureSelection("EmotionDrawback", "Emotion Drawback",
-                "Emotion Drawbacks puts the focus on mental aspects of your character’s background.",
-                EmotionGuids[0], null, FeatureGroup.None, noFeature);
-            
-            noFeature.Feature = EmotionDrawbacks;
-
-            var choices = new List<BlueprintFeature>();
-            choices.Add(Helpers.CreateFeature("AnxiousDrawback", "Anxious",
-                "After suffering terribly for not being tight-lipped enough as a child, such as when you accidentally exposed your family to enemy inquisitors, you developed a habit of being overly cautious with your words."+
-                "\nDrawback: You take a –2 penalty on Persuasion checks and must speak slowly due to the concentration required.Unless stated otherwise, you are assumed to not be speaking at a volume above a whisper.",
-                EmotionGuids[1],
-                Helpers.NiceIcons(16), // great fortitude
-                FeatureGroup.None,
-                Helpers.CreateAddStatBonus(StatType.SkillPersuasion, -2, ModifierDescriptor.Penalty)));
-
-            //var tieflingHeritageDemodand = library.Get<BlueprintFeature>("a53d760a364cd90429e16aa1e7048d0a");
-            choices.Add(Helpers.CreateFeature("AttachedDrawback", "Attached",
-                "You are attached to yourself. Whenever the object of your attachment is either threatened, in danger, or in someone else’s possession," +
-                "\nDrawback you take a –1 penalty on Will saves and a –2 penalty on saves against fear effects.",
-                EmotionGuids[2],
-                Helpers.GetIcon("2483a523984f44944a7cf157b21bf79c"), // Elven Immunities
-                FeatureGroup.None,
-                Helpers.CreateAddStatBonus(StatType.SaveWill, -1, ModifierDescriptor.Penalty),
-                Helpers.Create<SavingThrowBonusAgainstDescriptor>(s => { s.SpellDescriptor = SpellDescriptor.Fear; s.Value = -2; s.ModifierDescriptor = ModifierDescriptor.Penalty; })));
-
-
-            choices.Add(Helpers.CreateFeature("BetrayedDrawback", "Betrayed",
-                "You can roll twice and take the lower result on Sense Motive checks to get hunches. You cannot reroll this result, even if you have another ability that would normally allow you to do so" +
-                "\nDrawback: You take a –3 on diplomacy.",
-                EmotionGuids[3],
-                Helpers.NiceIcons(2), // Accomplished Sneak Attacker
-                FeatureGroup.None,
-                Helpers.CreateAddStatBonus(StatType.CheckDiplomacy, -3, ModifierDescriptor.Penalty)));
-
-
-            choices.Add(Helpers.CreateFeature("BitterDrawback", "Bitter",
-                "You have been hurt repeatedly by those you trusted, and it has become difficult for you to accept help."+
-                "\nDrawback: When you receive healing from an ally’s class feature, spell, or spell-like ability, reduce the amount of that healing by 1 hit point.",
-                EmotionGuids[4],
-                Helpers.NiceIcons(5), // great fortitude
-                FeatureGroup.None,
-                Helpers.Create<FeyFoundlingLogic>(s => { s.dieModefier = 0; s.flatModefier = -1; })));
-
-            choices.Add(Helpers.CreateFeature("CondescendingDrawback", "Condescending",
-                "Raised with the assurance that only those like you are truly worthy of respect, you have an off-putting way of demonstrating that you look down on those not of your race and ethnicity or nationality." +
-                "\nDrawback: You take a –5 penalty on diplomacy and intimidate checks",
-                EmotionGuids[5],
-                Helpers.NiceIcons(10), // enchantment
-                FeatureGroup.None,
-                Helpers.CreateAddStatBonus(StatType.CheckDiplomacy, -5, ModifierDescriptor.Penalty),
-                Helpers.CreateAddStatBonus(StatType.CheckIntimidate, -5, ModifierDescriptor.Penalty)));
-
-            //Effect Your base speed when frightened and fleeing increases by 5 feet, and the penalties you take from having the cowering, frightened, panicked, or shaken conditions increase by 1.If you would normally be immune to fear, you do not take these penalties but instead lose your immunity to fear(regardless of its source).
-            choices.Add(Helpers.CreateFeature("CowardlyDrawback", "Cowardly",
-                "You might face dangerous situations with bravado, but you are constantly afraid. and if you see a dead body you might just throw up." +
-                "\nBenefit:+5 movementspeed"+
-                "\nDrawback you take a –4 penalty on saves against fear effects. and -2 to all fortituede saves",
-                EmotionGuids[6],
-                Helpers.NiceIcons(6), //invisiblilty
-                FeatureGroup.None,
-                Helpers.CreateAddStatBonus(StatType.SaveFortitude, -2, ModifierDescriptor.Penalty),
-                Helpers.CreateAddStatBonus(StatType.Speed, 5, ModifierDescriptor.FearPenalty),
-                Helpers.Create<SavingThrowBonusAgainstDescriptor>(s => { s.SpellDescriptor = SpellDescriptor.Fear; s.Value = -4; s.ModifierDescriptor = ModifierDescriptor.Penalty; })));
-
-            choices.Add(Helpers.CreateFeature("CrueltyDrawback", "Cruelty",
-                "You were rewarded as a child for flaunting your victory over others as completely as possible, and you discovered you enjoyed the feeling of rubbing your foes’ faces in the dirt." +
-                "\nBenefit:+2 on attacks against flanked targets" +
-                "\nDrawback: You take a –2 penalty on attack rols against someone that is not flanked.",
-                EmotionGuids[7],
-                Helpers.NiceIcons(9), // breakbone
-                FeatureGroup.None,
-                Helpers.CreateAddStatBonus(StatType.BaseAttackBonus, -2, ModifierDescriptor.Penalty),
-                DamageBonusAgainstFlankedTarget.Create(4)));
-
-            choices.Add(Helpers.CreateFeature("EmptyMaskDrawback", "Empty Mask",
-                "You have spent so long hiding your true identity to escape political enemies that you have lost much of your sense of self." +
-                "\nDrawback: you take a –1 penalty on Will saves vs compulsion and a –2 vs people that know your identity.",
-                EmotionGuids[8],
-                Helpers.NiceIcons(14), // mask
-                FeatureGroup.None,
-                //Helpers.CreateAddStatBonus(StatType.SaveWill, -1, ModifierDescriptor.Penalty),
-                Helpers.Create<SavingThrowBonusAgainstDescriptor>(s => { s.SpellDescriptor = SpellDescriptor.Compulsion; s.Value = -2; s.ModifierDescriptor = ModifierDescriptor.Penalty; })));
-
-            var debuff = Helpers.CreateBuff("EnvyDeBuff", "Envy",
-                "You have 2 less on concentration checks.",
-                EmotionGuids[9],
-                Helpers.NiceIcons(1), null,
-                Helpers.Create<ConcentrationBonus>(a => { a.Value = -2; a.CheckFact = true; }));
-
-            choices.Add(Helpers.CreateFeature("EnvyDrawback", "Envy",
-                "You grew up in or near an opulent, decadent culture that valued nothing more than showing up the material wealth or accomplishments of others, causing the seed of envy to be planted in your heart." +
-                "\nDrawback: You have 2 less on concentration checks. if you do not posses at least 100 + 200 per level gold.",
-                EmotionGuids[10],
-                Helpers.NiceIcons(1), //grab
-                FeatureGroup.None,
-                CovetousCurseLogic.Create(debuff)));//
-            //
-            //int rnd = DateTime.Now.Millisecond % 64;
-            var Fraud = Helpers.CreateFeatureSelection("GuiltyFraudDrawback", "Guilty Fraud",
-                "You received something through trickery that you did not deserve, and your guilt for the misdeed distracts you from dangers around you." +
-                "\nBenefit:start the game dual wielding a one handed weapon." +
-                "\nDrawback: You take a –2 penalty on Persuasion checks.",
-                EmotionGuids[11],
-                Helpers.NiceIcons(999), // great fortitude
-                FeatureGroup.None,
-                //WeaponCategory.LightRepeatingCrossbow                
-                Helpers.CreateAddStatBonus(StatType.SkillPersuasion, -2, ModifierDescriptor.Penalty));
-            
-            //var weap = WeaponCategory.Dart;
-            var hoi = new List<BlueprintFeature>() {      };
-            x = 11;//x is just a cheat value we use to ged guids
-            //foreach (WeaponCategory weap in (WeaponCategory[])Enum.GetValues(typeof(WeaponCategory)))
-            var weapons = new WeaponCategory[] {
-                WeaponCategory.Dagger,                WeaponCategory.Dart,
-                WeaponCategory.DuelingSword,                WeaponCategory.ElvenCurvedBlade,
-                WeaponCategory.Flail,                WeaponCategory.Greataxe,
-                WeaponCategory.Javelin,                WeaponCategory.LightMace,
-                WeaponCategory.Shuriken,                WeaponCategory.Sickle,
-                WeaponCategory.Sling,                WeaponCategory.Kama,
-                WeaponCategory.Kukri,                WeaponCategory.Starknife,
-                WeaponCategory.ThrowingAxe,                WeaponCategory.SpikedHeavyShield,
-                WeaponCategory.SpikedLightShield,                WeaponCategory.Trident,
-                WeaponCategory.BastardSword,                WeaponCategory.Battleaxe,
-                WeaponCategory.Longsword,                WeaponCategory.Nunchaku,
-                WeaponCategory.Rapier,                WeaponCategory.Sai,
-                WeaponCategory.Scimitar,                WeaponCategory.Shortsword,
-                WeaponCategory.Club,                WeaponCategory.WeaponLightShield,
-                WeaponCategory.WeaponHeavyShield,                WeaponCategory.HeavyMace,
-            };
-            foreach (WeaponCategory weap in weapons)
-            {
-                
-                x++;
-                hoi.Add(Helpers.CreateFeature(
-                $"Greedy{weap}Drawback",
-                $"your scram reward — {weap}",
-                $"{weap}",EmotionGuids[x]
-                ,
-                Helpers.NiceIcons(999), FeatureGroup.None,                
-                Helpers.Create<AddStartingEquipment>(a =>
-                {
-                    
-                    a.CategoryItems = new WeaponCategory[] { weap,weap };
-                    a.RestrictedByClass = Array.Empty<BlueprintCharacterClass>();
-                    
-                    a.BasicItems = Array.Empty<BlueprintItem>();
-                })));
-
-                //Log.Write(x.ToString());
-            }
-            //Log.Write(x.ToString());
-            x++;
-            choices.Add(Helpers.CreateFeature("HauntedDrawback", "Haunted",
-                "Something from your past—or a dark secret you presently hold—makes it difficult for you to ever be at peace, and your chronic worry that you might fall to evil influence has become a self-fulfilling prophecy.." +
-                "\nDrawback: you take a –2 penalty on spells with the evil descriptor.",
-                EmotionGuids[x],
-                Helpers.NiceIcons(27), // fatigue
-                FeatureGroup.None,
-                //Helpers.CreateAddStatBonus(StatType.SaveWill, -1, ModifierDescriptor.Penalty),
-                Helpers.Create<SavingThrowBonusAgainstDescriptor>(s => { s.SpellDescriptor = SpellDescriptor.Evil; s.Value = -2; s.ModifierDescriptor = ModifierDescriptor.Penalty; })));
-            x++;
-            choices.Add(Helpers.CreateFeature("HauntedRegretDrawback", "Haunting Regret",
-                "When you were young, a relative with whom you had frequently quarreled passed away where his or her soul could not rest. Now, the unquiet spirit appears around you at inconvenient times, distracting you with regret for being unable to help." +
-                "\nDrawback: You take a –2 penalty on saving throws against the distraction ability of swarms and mind-affecting effects and on concentration checks.",
-                EmotionGuids[x],
-                Helpers.NiceIcons(7),//fatigue//
-                FeatureGroup.None,
-                Helpers.Create<ConcentrationBonus>(a => a.Value = -2),
-                Helpers.Create<SavingThrowBonusAgainstDescriptor>(s => { s.SpellDescriptor = SpellDescriptor.MindAffecting; s.Value = -2; s.ModifierDescriptor = ModifierDescriptor.Penalty; })));
-            x++;
-            choices.Add(Helpers.CreateFeature("ImpatientDrawback", "Impatient",
-                "YouYou love leaping into battle at the earliest opportunity, and it frustrates you to wait for others to act." +
-                "\nBenefit:+1 Ininiative" +
-                "\nDrawback you take a –2 penalty on saves against evil. and -1 to all attack rolls",
-                EmotionGuids[x],
-                Helpers.NiceIcons(33), //rush
-                FeatureGroup.None,
-                Helpers.CreateAddStatBonus(StatType.BaseAttackBonus, -1, ModifierDescriptor.Penalty),
-                Helpers.CreateAddStatBonus(StatType.Initiative, 1, ModifierDescriptor.FearPenalty),
-                Helpers.Create<SavingThrowBonusAgainstDescriptor>(s => { s.SpellDescriptor = SpellDescriptor.Evil; s.Value = -2; s.ModifierDescriptor = ModifierDescriptor.Penalty; })));
-
-
-            Fraud.SetFeatures(hoi);
-            choices.Add(Fraud);
-            EmotionDrawbacks.SetFeatures(choices);
-            return EmotionDrawbacks;
-        }
-
+       
        
         public static List<BlueprintAbility> CollectTieflingAbilities(BlueprintFeatureSelection selection)
         {
@@ -382,10 +184,15 @@ namespace EldritchArcana
             var noFeature = Helpers.PrerequisiteNoFeature(null);
             var customTraits = Helpers.CreateFeatureSelection("CustomTrait", "Custom Trait{cheat}",
                 "These traits are a little overpowered and are here just for fun, if you want to play fair don't pick em.",
-                "9e41e60c929e46bc84ded046148d08ec", null, FeatureGroup.None, noFeature);
-            noFeature.Feature = customTraits;
+                "9e41e60c929e46bc84ded046148d08ec", null, FeatureGroup.None);
+            //noFeature.Feature = customTraits;
             var choices = new List<BlueprintFeature>();
-
+            /*
+            foreach (StatType stat in (StatType[])Enum.GetValues(typeof(StatType)))
+            {
+                Log.Write(stat.ToString());
+            }
+            */
 
             var metamagicMaster = Helpers.CreateFeatureSelection("MetamagicMasterTrait", "Metamagic expert([cheat])",
                 "Your ability to alter your spell of choice is greater than expected.\nBenefit: Select one spell of 3rd level or below; when you use the chosen spell with a metamagic feat, it uses up three spell slots one level lower than it normally would.\nstarting level is still minimun",
@@ -399,7 +206,7 @@ namespace EldritchArcana
             choices.Add(Helpers.CreateFeature("MysticTrait", "Mystic Prophecy",
                 "no one knows where You were born. its a Mistery you where given a the divine blessing to complete a prophecy\nBenefit: At level 10 your prophecy will come true +2 wis,int +10 arcana",
                 "e50acadda65b4028884dd4a74f14e228",
-                Helpers.GetIcon("175d1577bb6c9a04baf88eec99c66334"), // Iron Will
+                Helpers.NiceIcons(19), // Iron Will
                 FeatureGroup.None,
                 Helpers.CreateAddStatBonusOnLevel(StatType.SkillKnowledgeArcana, 10, ModifierDescriptor.Trait, 10),
                 Helpers.CreateAddStatBonusOnLevel(StatType.SkillKnowledgeWorld, 10, ModifierDescriptor.Trait, 10),
@@ -427,6 +234,31 @@ namespace EldritchArcana
                 //Helpers.Create<IncreaseCasterLevelUpToCharacterLevel>()
                 Helpers.Create<IncreaseCasterLevelCharacterLevel>()
                 ));
+
+            choices.Add(Helpers.CreateFeature("BloodHavocTrait", "Blood havoc Damage Bonus",
+                            "Whenever you cast a bloodrager or sorcerer spell that deals damage, add 1 point of damage per die rolled.",
+                            "2dd15d5aa003498ba7f945530d22e444",
+                            Helpers.NiceIcons(28), // M
+                            FeatureGroup.None,
+                            //Helpers.Create<IncreaseCasterLevelUpToCharacterLevel>()
+                            Helpers.Create<OrcBloodlineArcana>()
+                            ));
+
+
+            var dwarfy = new BlueprintComponent[64];
+            for (int i = 1; i < 65; i++)
+            {
+                dwarfy[i - 1] = Helpers.CreateAddStatBonusOnLevel(StatType.HitPoints, i * 2, ModifierDescriptor.Trait, i);
+            };
+            var dwarfReq = Helpers.PrerequisiteFeature(Helpers.dwarf);
+            var bulkybattleborn = Helpers.CreateFeature("BulkyAfTrait", "Bulky Battleborn (Dwarf)",
+                "Your greatest joy is being in the thick of battle and taking hits for the team,\nNote: this trait is not realy a cheat but it's homebrew so that's why its here. \nBenefit:you gain 2 extra hitpoints per level",
+                "a987f5e69db44cdd99983985e37a6c3b",
+                Helpers.GetIcon("121811173a614534e8720d7550aae253"), // Weapon Specialization
+                FeatureGroup.None,
+                dwarfReq);
+            bulkybattleborn.AddComponents(dwarfy);
+            choices.Add(bulkybattleborn);
 
 
             if (optedin) customTraits.SetFeatures(choices);
@@ -466,6 +298,37 @@ namespace EldritchArcana
         }
 
 
+        internal static List<BlueprintFeature> ReturnSpellOptions(BlueprintFeatureSelection selection, int minLevel, int maxLevel, params BlueprintComponent[] components)
+        {
+            return ReturnSpellOptions(selection, minLevel, maxLevel, null, (_) => components);
+        }
+
+        internal static List<BlueprintFeature> ReturnSpellOptions(BlueprintFeatureSelection selection, int minLevel, int maxLevel, BlueprintSpellList spellList, Func<int, BlueprintComponent[]> createComponents, BlueprintCharacterClass learnSpellClass = null)
+        {
+            var choices = new List<BlueprintFeature>();
+            for (int level = minLevel; level <= maxLevel; level++) { 
+
+                
+                var spellChoice = Helpers.CreateParamSelection<SelectLuckySpellAtLevel>(
+                    $"{selection.name}Level{level}",
+                    $"{selection.Name} (Spell Level {level})",
+                    selection.Description,
+                    Helpers.MergeIds(selection.AssetGuid, FavoredClassBonus.spellLevelGuids[level - 1]),
+                    null,
+                    FeatureGroup.None,
+                    createComponents(level));
+                spellChoice.SpellList = spellList;
+                spellChoice.SpellLevel = level;
+                spellChoice.SpellcasterClass = learnSpellClass;
+                spellChoice.CheckNotKnown = learnSpellClass != null;
+                choices.Add(spellChoice);
+
+            }
+            //choices.Add(UndoSelection.Feature.Value);
+            return choices;
+        }
+
+
 
         internal static List<BlueprintFeature> FillTripleSpellSelection(BlueprintFeatureSelection selection, int minLevel, int maxLevel, params BlueprintComponent[] components)
         {
@@ -475,7 +338,7 @@ namespace EldritchArcana
         internal static List<BlueprintFeature> FillTripleSpellSelection(BlueprintFeatureSelection selection, int minLevel, int maxLevel, BlueprintSpellList spellList, Func<int, BlueprintComponent[]> createComponents, BlueprintCharacterClass learnSpellClass = null)
         {
             var choices = new List<BlueprintFeature>();
-
+            
             //var choicelist = new List<BlueprintFeature>();
             string[] GuidList = new string[]
             {
@@ -502,6 +365,8 @@ namespace EldritchArcana
                 spellChoice.SpellcasterClass = learnSpellClass;
                 spellChoice.CheckNotKnown = learnSpellClass != null;
                 choices.Add(spellChoice);
+
+                
             }
             choices.Add(UndoSelection.Feature.Value);
             return choices;
@@ -572,14 +437,33 @@ namespace EldritchArcana
         public void OnEventDidTrigger(RuleCalculateAbilityParams evt) { }
     }
     [AllowedOn(typeof(BlueprintParametrizedFeature))]
+
     public class IncreaseCasterLevelForSpellMax : ParametrizedFeatureComponent, IInitiatorRulebookHandler<RuleCalculateAbilityParams>
     {
-        public int Bonus = Main.settings?.CheatCustomTraits == true ? 999999999 : 1;
+        public int Bonus;
         public void OnEventAboutToTrigger(RuleCalculateAbilityParams evt)
         {
             var spell = Param.Blueprint;
             if (evt.Spell != spell && evt.Spell?.Parent != spell) return;
-            Log.Write($"Increase caster level of {spell.name} by {Bonus}");
+            Bonus = Main.settings?.HighDCl == true ? 999999999 : 1;
+            Log.Write($"Increase caster level and dc of {spell.name} by {Bonus}");
+            evt.AddBonusDC(Bonus);
+            evt.AddBonusCasterLevel(Bonus);
+        }
+
+        public void OnEventDidTrigger(RuleCalculateAbilityParams evt) { }
+    }
+
+
+    public class Increaselucky : ParametrizedFeatureComponent, IInitiatorRulebookHandler<RuleCalculateAbilityParams>
+    {
+        public int Bonus;
+        public void OnEventAboutToTrigger(RuleCalculateAbilityParams evt)
+        {
+            var spell = Param.Blueprint;
+            if (evt.Spell != spell && evt.Spell?.Parent != spell) return;
+            Bonus = 2;
+            Log.Write($"Increase caster level and dc of {spell.name} by {Bonus}");
             evt.AddBonusDC(Bonus);
             evt.AddBonusCasterLevel(Bonus);
         }
@@ -635,7 +519,7 @@ namespace EldritchArcana
 
             int bonus = GetBonus(spellbook);
             Log.Write($"Increase caster level of {evt.Spell?.name} by {bonus}");
-            if (bonus > 1) { evt.Spellbook.AddCasterLevel(); }
+            if (bonus > 0) { evt.Spellbook.AddCasterLevel(); }
             //evt.AddBonusCasterLevel(bonus);
         }
 
@@ -692,6 +576,66 @@ namespace EldritchArcana
             return !CheckNotKnown || !unit.GetSpellbook(SpellcasterClass).IsKnown(param.Blueprint as BlueprintAbility);
         }
     }
+    
+    // If `CheckNotKnown` is set, it will also check that the `SpellcasterClass` spellbook does not
+    // already contain this spell.
+    public class SelectLuckySpellAtLevel : CustomParamSelection
+    {
+        public bool CheckNotKnown;
+        public int spellnumber= DateTime.Now.Millisecond;
+
+        protected override IEnumerable<BlueprintScriptableObject> GetItems(UnitDescriptor beforeLevelUpUnit, UnitDescriptor previewUnit)
+        {
+            if (SpellList != null)
+            {
+                return SpellList.SpellsByLevel[SpellLevel].Spells;
+            }
+
+            // For traits: it's valid to take any spell, even one not from your current
+            // class that you may be able to cast later.
+            int x = 0;
+            var spells = new List<BlueprintAbility>();
+            foreach (var spell in Helpers.allSpells)
+            {
+                if (spell.Parent != null) continue;
+
+                var spellLists = spell.GetComponents<SpellListComponent>();
+                if (spellLists.FirstOrDefault() == null) continue;
+
+                var level = spellLists.Min(l => l.SpellLevel);
+                if (level == SpellLevel)
+                {
+                    x += 1;
+                }
+            }
+            spellnumber = spellnumber % x;
+            x = 0;
+            foreach (var spell in Helpers.allSpells)
+            {
+                if (spell.Parent != null) continue;
+
+                var spellLists = spell.GetComponents<SpellListComponent>();
+                if (spellLists.FirstOrDefault() == null) continue;
+
+                var level = spellLists.Min(l => l.SpellLevel);
+                if (level == SpellLevel) {
+                    x += 1;
+                    if (spellnumber == x) spells.Add(spell);
+                }
+            }
+            return spells;
+        }
+
+        protected override IEnumerable<BlueprintScriptableObject> GetAllItems() => Helpers.allSpells;
+
+        protected override bool CanSelect(UnitDescriptor unit, FeatureParam param)
+        {
+            // TODO: this doesn't seem to work.
+            return !CheckNotKnown || !unit.GetSpellbook(SpellcasterClass).IsKnown(param.Blueprint as BlueprintAbility);
+        }
+    }
+
+   
 
 
     [AllowedOn(typeof(BlueprintUnitFact))]
@@ -826,6 +770,7 @@ namespace EldritchArcana
 
         public override void OnEventAboutToTrigger(RuleCalculateAttackBonus evt)
         {
+
             var hpPercent = ((float)Owner.HPLeft) / Owner.MaxHP;
             //Log.Write($"RuleCalculateAttackBonus HP {hpPercent}%, alignment {evt.Target.Descriptor.Alignment.Value}, TargetAlignment {TargetAlignment}, bonus {Value}, descriptor {Descriptor}");
             if (hpPercent < HitPointPercent &&
@@ -840,6 +785,40 @@ namespace EldritchArcana
         public override void OnEventDidTrigger(RuleCalculateAttackBonus evt) { }
     }
 
+    [AllowedOn(typeof(BlueprintUnitFact))]
+    [AllowMultipleComponents]
+    public class BuffIfHealth : RuleInitiatorLogicComponent<RuleCalculateAttackBonus>
+    {
+        [JsonProperty]
+        Buff appliedBuff;
+
+
+        public ModifierDescriptor Descriptor;
+
+        public int Value;
+
+        public float HitPointPercent;
+        //public override void 
+        public override void OnEventAboutToTrigger(RuleCalculateAttackBonus evt)
+        {
+            var FrogPolymorphBuff = Traits.library.Get<BlueprintBuff>("662aa00fd6242e643b60ac8336ff39e6");
+            var hpPercent = ((float)Owner.HPLeft) / Owner.MaxHP;
+            //Log.Write($"RuleCalculateAttackBonus HP {hpPercent}%, alignment {evt.Target.Descriptor.Alignment.Value}, TargetAlignment {TargetAlignment}, bonus {Value}, descriptor {Descriptor}");
+            if (hpPercent < HitPointPercent)
+            {
+                // TODO: this bonus should be a "trait" bonus. But doing it this way shows up in the UI.
+                appliedBuff = Owner.AddBuff(FrogPolymorphBuff,Owner.Unit,TimeSpan.FromSeconds(12.0));
+                evt.AddBonus(Value, Fact);
+
+                //evt.AddTemporaryModifier(evt.Initiator.Stats.AdditionalAttackBonus.AddModifier(Value, this, Descriptor));
+            }
+        }
+
+        public override void OnEventDidTrigger(RuleCalculateAttackBonus evt) { }
+    }
+
+
+    
 
     public class ReplaceBaseStatForStatTypeLogic : OwnedGameLogicComponent<UnitDescriptor>
     {
@@ -850,7 +829,7 @@ namespace EldritchArcana
         public override void OnTurnOn()
         {
             ModifiableValue value = base.Owner.Stats.GetStat(StatTypeToReplaceBastStatFor);
-            if (value.GetType() == typeof(ModifiableValueSkill))
+            if (true)//value.GetType() == typeof(ModifiableValueSkill))
             {
                 if (_oldStatType == null)
                 {
@@ -871,7 +850,7 @@ namespace EldritchArcana
         public override void OnTurnOff()
         {
             ModifiableValue value = base.Owner.Stats.GetStat(StatTypeToReplaceBastStatFor);
-            if (value.GetType() == typeof(ModifiableValueSkill) && _oldStatType != null)
+            if (true)//value.GetType() == typeof(ModifiableValueSkill) && _oldStatType != null)
             {
                 ModifiableValue oldStat = base.Owner.Stats.GetStat((StatType)_oldStatType);
                 ModifiableValue newStat = base.Owner.Stats.GetStat(NewBaseStatType);

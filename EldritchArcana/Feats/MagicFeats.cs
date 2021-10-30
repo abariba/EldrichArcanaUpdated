@@ -51,7 +51,11 @@ namespace EldritchArcana
             magus = library.Get<BlueprintCharacterClass>("45a4607686d96a1498891b3286121780");
 
             // Load metamagic feats
-            var metamagicFeats = SafeLoad(MetamagicFeats.CreateMetamagicFeats, "Metamagic feats")?.ToArray();
+            //Turn off 
+            var metamagicFeats = Main.settings?.FavoredMetamagic == true ? SafeLoad(MetamagicFeats.CreateMetamagicFeats, "Metamagic feats")?.ToArray():null ;
+
+
+
             if (metamagicFeats == null) metamagicFeats = Array.Empty<BlueprintFeature>();
             var feats = metamagicFeats.ToList();
 
@@ -64,7 +68,7 @@ namespace EldritchArcana
             // Add metamagics and Opposition Research to Wizard bonus feat list.
             library.AddFeats( /*WizardFeatSelection*/ "8c3102c2ff3b69444b139a98521a4899", feats.ToArray());
 
-            SafeAddToList(CreateMagesTattoo, feats, "Mage's Tattoo");
+            if (Main.settings?.DrawbackForextraTraits == true) { SafeAddToList(CreateMagesTattoo, feats, "Mage's Tattoo"); }
             SafeAddToList(() => CreateSpellPerfection(metamagicFeats), feats, "Spell Perfection");
 
             // Magus Arcanas, Extra Magus Arcana
@@ -72,7 +76,8 @@ namespace EldritchArcana
 
             Main.SafeLoad(LoadDervishDance, "Dervish Dance");
 
-            SafeAddToList(CreateFeyFoundling, feats, "Fey Foundling");
+            if (Main.settings?.DrawbackForextraTraits == true) { SafeAddToList(CreateFeyFoundling, feats, "Fey Foundling"); }
+            SafeAddToList(CreateRollWithIt, feats, "Roll with it");
 
             // Add all feats (including metamagic, wizard discoveries) to general feats.         
             library.AddFeats(feats.ToArray());
@@ -101,11 +106,29 @@ namespace EldritchArcana
             var feat = Helpers.CreateFeature("FeyFoundling", "Fey Foundling",
                 "You were found in the wilds as a child.\nWhenever you receive magical healing, you heal an additional 2 points per die rolled. You gain a +2 bonus on all saving throws against death effects. Unfortunately, you also suffer +1 point of damage from cold iron weapons (although you can wield cold iron weapons without significant discomfort).",
                 "0659556638b04ecc85e069e050751bfa",
-                Helpers.GetIcon("e8445256abbdc45488c2d90373f7dae8"),
+                Image2Sprite.Create("Mods/EldritchArcana/sprites/fey_foundling.png"),
                 FeatureGroup.Feat,
                 Helpers.Create<SavingThrowBonusAgainstDescriptor>(s => { s.SpellDescriptor = SpellDescriptor.Death; s.ModifierDescriptor = ModifierDescriptor.Feat; }),
                 Helpers.Create<FeyFoundlingLogic>(s => { s.dieModefier = 2;}),
                 PrerequisiteCharacterLevelExact.Create(1));
+            return feat;
+        }
+
+        static BlueprintFeature CreateRollWithIt()
+        {
+            var goblinReq = Helpers.PrerequisiteFeature(Helpers.goblin);
+            var feat = Helpers.CreateFeature("RollWithIt", "Roll With It",
+                "You know how to take a hit, even if your reaction sends you bouncing and flying out of battle while shrieking at the top of your lungs." +
+                "\nBenefit: If you are struck by a melee weapon you can try to convert some of that damage into a movement correction. that way you reduce damage by 13 points",
+                "1249556638b04ecc85e069e230751bfa",
+                Image2Sprite.Create("Mods/EldritchArcana/sprites/optimistic_gambler.png"),
+                FeatureGroup.Feat,
+                Helpers.Create<AddDamageResistancePhysical>(s => { s.Value = 13; }),
+                Helpers.PrerequisiteStatValue(StatType.SkillMobility,5),
+                Helpers.Create<RecommendationHasFeature>(r => r.Feature = Helpers.goblin)
+
+                , goblinReq);
+            
             return feat;
         }
 
@@ -145,7 +168,7 @@ namespace EldritchArcana
                     ? "This does not increase the level of the spell."
                     : "This does not increase the casting time or the level of the spell."),
                 Helpers.MergeIds(metamagicFeat.AssetGuid, "65768d69b6b84954b3d6a1d1dc265cf8"),
-                metamagicFeat.Icon,
+                Image2Sprite.Create("Mods/EldritchArcana/sprites/extra_arcana.png"),//metamagicFeat.Icon,
                 FeatureGroup.MagusArcana);
 
             var resource = Helpers.CreateAbilityResource($"{feat.name}Resource", "", "",
@@ -175,7 +198,7 @@ namespace EldritchArcana
                 "You have unlocked the secret of a new magus arcana. You gain one additional magus arcana. You must meet all the prerequisites for this magus arcana.\n" +
                 "Special: You can gain this feat multiple times. Its effects stack, granting a new arcana each time you gain this feat.",
                 assetId,
-                Helpers.GetIcon("cd9f19775bd9d3343a31a065e93f0c47"), // extra channel
+                Image2Sprite.Create("Mods/EldritchArcana/sprites/extra_arcana.png"),
                 FeatureGroup.Feat,
                 magusArcanas.PrerequisiteFeature());
             feat.SetFeatures(magusArcanas.AllFeatures);
@@ -257,7 +280,7 @@ namespace EldritchArcana
             var dervishDance = Helpers.CreateFeature("DervishDance", "Dervish Dance",
                 "When wielding a scimitar with one hand, you can use your Dexterity modifier instead of your Strength modifier on melee attack and damage rolls. You treat the scimitar as a one-handed piercing weapon for all feats and class abilities that require such a weapon (such as a duelist's precise strike ability). The scimitar must be for a creature of your size. You cannot use this feat if you are carrying a weapon or shield in your off hand.",
                 "7d0bb2ade9344cae833c5bbe66bf0460",
-                slashingGrace.Icon,
+                Image2Sprite.Create("Mods/EldritchArcana/sprites/dervish_dance.png"),
                 FeatureGroup.Feat,
                 weaponFinesse.PrerequisiteFeature(),
                 Helpers.PrerequisiteStatValue(StatType.Dexterity, 13),
@@ -281,12 +304,13 @@ namespace EldritchArcana
         {
             spellFocus = library.Get<BlueprintParametrizedFeature>("16fa59cc9a72a6043b566b49184f53fe");
             spellFocusGreater = (library.Get<BlueprintParametrizedFeature>("5b04b45b228461c43bad768eb0f7c7bf"));
+
             var noFeature = Helpers.PrerequisiteNoFeature(null);
             magesTattoo = Helpers.CreateParametrizedFeature("MagesTattooSelection",
                 "Mage's Tattoo",
                 "Select a school of magic in which you have Spell Focus—you cast spells from this school at +1 caster level.",
                 "8004aabdc67145c5b0613b7580d77da1",
-                spellFocusGreater.Icon,
+                Image2Sprite.Create("Mods/EldritchArcana/sprites/mages_tattoo.png"),
                 FeatureGroup.Feat,
                 FeatureParameterType.SpellSchool,
                 spellFocus.PrerequisiteFeature(),
@@ -324,7 +348,7 @@ namespace EldritchArcana
                 "Spell Perfection",
                 "Pick one spell which you have the ability to cast. Whenever you cast that spell you may apply any one metamagic feat you have to that spell without affecting its level or casting time, as long as the total modified level of the spell does not use a spell slot above 9th level. In addition, if you have other feats which allow you to apply a set numerical bonus to any aspect of this spell (such as Spell Focus, Spell Penetration, Weapon Focus [ray], and so on), double the bonus granted by that feat when applied to this spell.",
                 "82165fb15af34cbb9c0c2e6fb232b2fc",
-                spellSpecialization.Icon,
+                Image2Sprite.Create("Mods/EldritchArcana/sprites/spell_perfection.png"),
                 FeatureGroup.Feat,
                 Helpers.PrerequisiteStatValue(StatType.SkillKnowledgeArcana, 15),
                 Helpers.Create<PrerequisiteFeaturesFromList>(p => { p.Amount = 3; p.Features = allMetamagics; }),
@@ -345,7 +369,7 @@ namespace EldritchArcana
                 "Opposition Research",
                 "Select one Wizard opposition school; preparing spells of this school now only requires one spell slot of the appropriate level instead of two, and you no longer have the –4 Spellcraft penalty for crafting items from that school.",
                 "48eb4a47b01e4d088f763ff20824189e",
-                spellFocusGreater.Icon,
+                Image2Sprite.Create("Mods/EldritchArcana/sprites/opposition_research.png"),
                 FeatureGroup.WizardFeat,
                 Helpers.PrerequisiteClassLevel(wizardClass, 9),
                 noFeature);
@@ -921,9 +945,9 @@ namespace EldritchArcana
         public void OnEventDidTrigger(RuleCalculateDamage evt) { }
 
         static ContextDiceValue currentHealDice;
-        static ContextDiceValue Bonus;
-
-
+        //static ContextDiceValue Bonus;
+        //
+        
         static FeyFoundlingLogic()
         {
             Main.ApplyPatch(typeof(ContextActionHealTarget_RunAction_Patch), "Fey Foundling (bonus heal)");
