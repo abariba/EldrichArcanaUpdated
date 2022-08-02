@@ -5,10 +5,13 @@
     <DebugType>Full</DebugType>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Spells\.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="Info.json" />
     <Content Include="Feats\EldritchHeritage.cs" />
     <Content Include="FavoredClassBonus.cs" />
-    <Content Include="Helpers.cs" />
+    <Content Include="Helper\Helpers.cs" />
     <Content Include="Main.cs" />
     <Content Include="Oracle\Oracle.cs" />
     <Content Include="Oracle\DragonMystery.cs" />
@@ -29,14 +32,10 @@
     <Content Include="Sorcerer\Bloodlines.cs" />
     <Content Include="Testing\SaveCompatibility.cs" />
     <Content Include="Testing\baseline_assets.txt" />
-    <Content Include="Spells\PrestigiousSpellcaster.cs" />
-    <Content Include="Spells\Metamagic.cs" />
-    <Content Include="Spells\MagicFeats.cs" />
     <Content Include="Spells\TimeStop.cs" />
     <Content Include="Spells\Fly.cs" />
     <Content Include="Spells\FireSpells.cs" />
     <Content Include="Spells\Spells.cs" />
-    <Content Include="Spells\KnockDetectSecrets.cs" />
     <Content Include="Spells\KnockAndDetectSecrets.cs" />
     <Content Include="Spells\DismissSpell.cs" />
     <Content Include="Spells\ReplaceSpell.cs" />
@@ -45,15 +44,15 @@
   </ItemGroup>
   <PropertyGroup>
     <PostBuildEvent>
-    xcopy /y "F:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\pathfinder-mods-1.0.2.1\\EldritchArcana\bin\Debug\net471\EldritchArcana.dll" "F:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\Mods\EldritchArcana"
-    xcopy /y "F:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\pathfinder-mods-1.0.2.1\\EldritchArcana\Info.json" "F:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\Mods\EldritchArcana"
-    xcopy /y "F:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\pathfinder-mods-1.0.2.1\\EldritchArcana\Testing\baseline_assets.txt" "F:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\Mods\EldritchArcana"
-    xcopy /y "F:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\pathfinder-mods-1.0.2.1\\EldritchArcana\CHANGELOG.md" "F:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\Mods\EldritchArcana"
-    ::xcopy /y "F:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\pathfinder-mods-1.0.2.1\\EldritchArcana\Images_sprites" "F:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\Mods\EldritchArcana\sprites"
+    xcopy /y "E:\SteamBackups\SteamLibrary\steamapps\common\Pathfinder Kingmaker\pathfinder-mods-1.0.2.1\EldritchArcana\bin\Debug\net471\EldritchArcana.dll" "D:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\Mods\EldritchArcana"
+    xcopy /y "E:\SteamBackups\SteamLibrary\steamapps\common\Pathfinder Kingmaker\pathfinder-mods-1.0.2.1\\EldritchArcana\Info.json" "D:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\Mods\EldritchArcana"
+    xcopy /y "E:\SteamBackups\SteamLibrary\steamapps\common\Pathfinder Kingmaker\pathfinder-mods-1.0.2.1\\EldritchArcana\Testing\baseline_assets.txt" "D:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\Mods\EldritchArcana"
+    xcopy /y "E:\SteamBackups\SteamLibrary\steamapps\common\Pathfinder Kingmaker\pathfinder-mods-1.0.2.1\\EldritchArcana\CHANGELOG.md" "D:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\Mods\EldritchArcana"
+    ::xcopy /y "E:\SteamBackups\SteamLibrary\steamapps\common\Pathfinder Kingmaker\pathfinder-mods-1.0.2.1\\EldritchArcana\Images_sprites" "D:\SteamLibrary\steamapps\common\Pathfinder Kingmaker\Mods\EldritchArcana\sprites"
 </PostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="fastJSON" Version="2.4.0.4" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="0Harmony12">

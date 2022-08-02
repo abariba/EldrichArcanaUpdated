@@ -441,6 +441,7 @@ namespace EldritchArcana
             //
             families.Add();
             */
+            /*
             var summonedBow = Traits.library.Get<BlueprintItem>("2fe00e2c0591ecd4b9abee963373c9a7");
             var EelCircletItem = Traits.library.Get<BlueprintItem>("f7d8c27c57d6bd949a5c2a85dc5ca045");
 
@@ -545,7 +546,7 @@ namespace EldritchArcana
             TristianAngelFeature,
             UndeadSummonFeature,
             */
-
+            /*
             var OptimisticGamblerOptions = new List<BlueprintFeature>() {
                 //SpellAtWill,
                 randsummom,
@@ -726,7 +727,7 @@ namespace EldritchArcana
             OptimisticGambler.SetFeatures(OptimisticGamblerOptions);
             OptimisticGambler.IgnorePrerequisites = true;
             choices.Add(OptimisticGambler);
-
+            */
             choices.Add(Helpers.CreateFeature("RostlanderTrait", "Rostlander",
                 "You were raised in the south of Brevoy, a land of dense forests and rolling plains, of crystalline rivers and endless sapphire skies. You come from hearty stock and were raised with simple sensibilities of hard work winning well-deserved gains, the importance of charity and compassion, and the value of personal and familial honor. Yours is the country of the Aldori swordlords and the heroes who refused to bend before the armies of a violent conqueror. You care little for matters of politics and nobles or of deception and schemes. As you are thoroughly Brevic, the call for champions willing to expand your land’s influence into the Stolen Lands has inflamed your sense of patriotism and honor, and so you have joined an expedition to quest southward. Your hardy nature grants you a +1 trait bonus on all Fortitude saves.",
                 "d99b9398af66406cac173884df308eb7",

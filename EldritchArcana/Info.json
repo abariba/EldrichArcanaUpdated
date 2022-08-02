@@ -2,7 +2,7 @@
   "Id": "EldritchArcana",
   "DisplayName": "Eldritch Arcana",
   "Author": "Elmindra_Joostjasper",
-  "Version": "2.0.1",
+  "Version": "2.0.2",
   "ManagerVersion": "0.22.0",
   "EntryMethod": "EldritchArcana.Main.Load",
   "HomePage": "https://github.com/jennyem/pathfinder-mods",

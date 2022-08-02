@@ -46,12 +46,28 @@ namespace EldritchArcana
             // ApplySpellbook.Apply and SelectFeature.Apply (used for Prestigious Spellcaster).
             foreach (var characterClass in Helpers.classes)
             {
-                CreateSpellReplacementProgression(characterClass.Spellbook);
-
-                foreach (var archetype in characterClass.Archetypes)
+                try
                 {
-                    CreateSpellReplacementProgression(archetype.ReplaceSpellbook);
+                    CreateSpellReplacementProgression(characterClass.Spellbook);
+                    foreach (var archetype in characterClass.Archetypes)
+                    {
+                        try
+                        {
+                            CreateSpellReplacementProgression(archetype.ReplaceSpellbook);
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Append($"Error replacing {archetype}:");
+                            Log.Error(ex);
+                        }                    
+                    }
                 }
+                catch (Exception ex)
+                {
+                    Log.Append($"Error replacing {characterClass}:");
+                    Log.Error(ex);
+                }
+
             }
 
             ApplySpellbook_Apply_Patch.onApplySpellbook.Add((state, unit, previousCasterLevel) =>

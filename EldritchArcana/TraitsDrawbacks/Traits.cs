@@ -40,6 +40,7 @@ using Harmony12;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
 using Newtonsoft.Json;
 using Kingmaker.UnitLogic.Buffs;
+using EldritchArcana.TraitsDrawbacks;
 
 namespace EldritchArcana
 {
@@ -97,6 +98,8 @@ namespace EldritchArcana
             choices.Add(SocialTraits.CreateSocialTraits(out adopted));
             choices.Add(EquipmentTraits.CreateEquipmentTraits());
             choices.Add(RaceTraits.CreateRaceTraits(adopted));
+
+            choices.Add(GamblerTraits.CreateGamblerTraits());
             choices.Add(CampaignTraits.CreateCampaignTraits());
             choices.Add(RegionalTraits.CreateRegionalTraits());
             // if main settings cheatcustomtrait = false it won't be added just be initialized
